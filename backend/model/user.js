@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 const { v1: uuidv1 } = require("uuid");
 
-var UserSchema = new mongoose.Schema(
+var schema = new mongoose.Schema(
   {
     //personal info
     name: {
@@ -113,7 +113,8 @@ var UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.virtual("password")
+schema
+  .virtual("password")
 
   .set(function (password) {
     this._password = password;
@@ -125,7 +126,7 @@ UserSchema.virtual("password")
     return this._password;
   });
 
-UserSchema.methods = {
+schema.methods = {
   authenticate: function (password) {
     return this.securePassword(password) === this.encrypted_password;
   },
@@ -144,4 +145,4 @@ UserSchema.methods = {
   },
 };
 
-module.exports = mongoose.model("users", UserSchema, "users");
+module.exports = mongoose.model("users", schema, "users");
