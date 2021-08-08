@@ -23,12 +23,10 @@ var schema = new mongoose.Schema(
     month: {
       type: Number,
       length: 2,
-      required: true,
     },
     year: {
       type: Number,
       length: 4,
-      required: true,
     },
   },
   { timestamps: true }
