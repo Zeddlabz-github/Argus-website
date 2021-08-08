@@ -21,7 +21,6 @@ mongo();
 //user routes
 const auth = require("./route/auth");
 // const user = require("./routes/user");
-const eom = require("./route/empOfMonth");
 const empOfMonth = require("./route/empOfMonth");
 
 app.use(express.static("public"));

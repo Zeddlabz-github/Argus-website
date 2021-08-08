@@ -20,6 +20,16 @@ var schema = new mongoose.Schema(
       data: Buffer,
       contentType: String,
     },
+    month: {
+      type: Number,
+      length: 2,
+      required: true,
+    },
+    year: {
+      type: Number,
+      length: 4,
+      required: true,
+    },
   },
   { timestamps: true }
 );
