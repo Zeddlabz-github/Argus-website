@@ -6,29 +6,25 @@ const express = require("express");
 const router = express.Router();
 const {
   saveData,
-  getData,
-  getDataById,
-  getDataByMonth,
-  deleteDataById,
   getAllData,
+  getDataById,
   updateDataById,
-} = require("../controller/empOfMonth");
+  deleteDataById,
+} = require("../controller/testimonial");
 const { isSignedIn, isValidToken, isAdmin } = require("../controller/auth");
 
-router.post("/eom/create", saveData);
-router.get("/eom/get", getData);
-router.get("/eom/get-id/:id", getDataById);
-router.get("/eom/get-month/:month", getDataByMonth);
-router.get("/eom/get-all", isSignedIn, isValidToken, isAdmin, getAllData);
+router.post("/testimonial/create", saveData);
+router.get("/testimonial/get/:id", getDataById);
+router.get("/testimonial/get-all", getAllData);
 router.put(
-  "/eom/update/:id",
+  "/testimonial/update/:id",
   isSignedIn,
   isValidToken,
   isAdmin,
   updateDataById
 );
 router.delete(
-  "/eom/delete/:id",
+  "/testimonial/delete/:id",
   isSignedIn,
   isValidToken,
   isAdmin,

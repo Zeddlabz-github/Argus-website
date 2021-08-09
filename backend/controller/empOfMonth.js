@@ -46,7 +46,6 @@ const saveData = (req, res) => {
           !empDesc ||
           !skills ||
           !description ||
-          !description ||
           !instructorName ||
           !instructorRole
         ) {
@@ -256,7 +255,7 @@ const updateDataById = (req, res) => {
 };
 
 const deleteDataById = (req, res) => {
-  model.findByIdAndDelete({ _id: req.body._id }).exec((err, data) => {
+  model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }

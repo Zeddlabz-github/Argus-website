@@ -35,8 +35,8 @@ router.post(
   signin
 );
 
-router.post(
-  "/update",
+router.put(
+  "/user/update",
   [check("id").isUUID().withMessage("Please Provide id")],
   update
 );

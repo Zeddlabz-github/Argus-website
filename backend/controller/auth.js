@@ -229,6 +229,7 @@ const isSignedIn = expressJwt({
   userProperty: "auth",
 });
 
+//middlewares
 const isValidToken = (err, req, res, next) => {
   if (err.name === "UnauthorizedError") {
     return res.status(401).json({ error: "Authentication Failed" });
@@ -236,7 +237,6 @@ const isValidToken = (err, req, res, next) => {
   next();
 };
 
-//middlewares
 const isAuthenticated = (req, res, next) => {
   let checker = req.profile && req.auth && req.profile._id == req.auth._id;
 
