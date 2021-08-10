@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import logo from './../../argus website/PNG/Logo Vectors.png'
+import {Link} from 'react-router-dom'
 
 class SignUp extends Component {
     
@@ -48,7 +49,7 @@ class SignUp extends Component {
                     <input className="w-full mb-3 py-3 px-4 border border-gray-400 focus:outline-none rounded-md focus:ring-1 ring-cyan-500" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange}/>
         
                     <button className="w-1/2 bg-red-700 text-white p-3 rounded-lg font-semibold text-lg">Login</button>
-                    <a className="text-gray-900 font-bold text-center my-2">Not yet Registered ?<span className="text-blue-500"> Register</span> </a>
+                    <a className="text-gray-900 font-bold text-center my-2">Not yet Registered ? <Link to="/signup"><span className="text-blue-500"> Register</span> </Link> </a>
                 </form>
             </div>
         </div>

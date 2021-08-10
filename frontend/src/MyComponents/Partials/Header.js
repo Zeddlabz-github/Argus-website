@@ -1,35 +1,60 @@
-import React from 'react'
+import React, { Component } from 'react'
+import logo from './../../argus website/PNG/Logo Vectors.png'
+import {Link} from 'react-router-dom'
 
-export default function Header() {
-  return (
-    <div>
-      <div class="flex items-center justify-between flex-wrap bg-teal p-6">
-  <div class="flex items-center flex-no-shrink text-white mr-6">
-    <svg class="h-8 w-8 mr-2" width="54" height="54" viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 22.1c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05zM0 38.3c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05z"/></svg>
-    <span class="font-semibold text-xl tracking-tight">Tailwind CSS</span>
-  </div>
-  <div class="block lg:hidden">
-    <button class="flex items-center px-3 py-2 border rounded text-teal-lighter border-teal-light hover:text-white hover:border-white">
-      <svg class="h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/></svg>
-    </button>
-  </div>
-  <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
-    <div class="text-sm lg:flex-grow">
-      <a href="#responsive-header" class="block mt-4 lg:inline-block lg:mt-0 text-teal-lighter hover:text-white mr-4">
-        Docs
-      </a>
-      <a href="#responsive-header" class="block mt-4 lg:inline-block lg:mt-0 text-teal-lighter hover:text-white mr-4">
-        Examples
-      </a>
-      <a href="#responsive-header" class="block mt-4 lg:inline-block lg:mt-0 text-teal-lighter hover:text-white">
-        Blog
-      </a>
+class Header extends Component {
+  render() {
+    return (
+<div class="w-full">
+  <div class="text-white body-font bg-red-1">
+    <div class="container w-9/12 mx-auto flex flex-wrap px-5 py-2 flex-col md:flex-row items-center">
+      <nav class="flex lg:w-2/5 flex-wrap items-center text-base md:ml-auto">
+        <a class="mr-5 px-3 py-2 border-2 text-sm text-white border-white rounded hover:text-red-700 hover:bg-white">Technology</a>
+        <a class="mr-5 px-3 py-2 border-2 text-sm text-white border-white rounded hover:text-red-700 hover:bg-white">Get Your Security Guard License</a>
+      </nav>
+        <a class="flex order-first lg:order-none lg:w-1/5 title-font font-medium items-center text-gray-900 lg:items-center lg:justify-center mb-4 md:mb-0">
+        <Link to="/">
+          <img src={logo} alt="Logo of Argus Security Services" class="w-24 shadow-lg"/>
+        </Link>
+        </a>
+      <div class="lg:w-2/5 inline-flex lg:justify-end ml-5 lg:ml-0">
+        <nav class="flex lg:w-full flex-wrap items-center text-base md:ml-auto">
+          <Link to="/login">
+          <a class="mr-3 px-3 py-2 border-2 text-sm text-white border-white rounded hover:text-red-700 hover:bg-white">Student Portal</a>
+          </Link>
+          <a class="mr-3 px-3 py-2 border-2 text-sm text-white border-white rounded hover:text-red-700 hover:bg-white">Client Portal</a>
+          <a class="mr-3 px-3 py-2 border-2 text-sm text-white border-white rounded hover:text-red-700 hover:bg-white">Employee Portal</a>
+        </nav>
+      </div>
     </div>
-    <div>
-      <a href="#" class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal hover:bg-white mt-4 lg:mt-0">Download</a>
-    </div>
+  </div>
+  <div class="container bg-opacity-0 -mb-8 mx-auto flex flex-wrap flex-col md:flex-row items-center ">
+    <nav class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+      <Link to="/about">
+      <a class="border border-gray-800 bg-gray-700 bg-opacity-50 text-l text-white px-16 py-2 hover:text-red-1">ABOUT</a>
+      </Link>
+
+      <Link to="/services">
+      <a class="border border-gray-800 bg-red-1 bg-opacity-50 text-l text-white px-16 py-2 hover:text-red-1">SERVICES</a>
+      </Link>
+
+      <Link to="/jobs">
+      <a class="border border-gray-800 bg-gray-500 bg-opacity-50 text-l text-white px-16 py-2 hover:text-red-1">JOBS</a>
+      </Link>
+      
+      <Link to="/training">
+      <a class="border border-gray-800 bg-gray-500 bg-opacity-50 text-l text-white px-16 py-2 hover:text-red-1">TRAINING</a>
+      </Link>
+
+      <Link to="/contact">
+      <a class="border border-gray-800 bg-gray-500 bg-opacity-50 text-l text-white px-16 py-2 hover:text-red-1">CONTACT</a>
+      </Link>
+    
+    </nav>
   </div>
 </div>
-    </div>
-  )
+    )
+  }
 }
+
+export default Header
