@@ -20,6 +20,10 @@ var schema = new mongoose.Schema(
       data: Buffer,
       contentType: String,
     },
+    instructorSign: {
+      data: Buffer,
+      contentType: String,
+    },
     month: {
       type: Number,
       length: 2,

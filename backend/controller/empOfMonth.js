@@ -80,6 +80,19 @@ const saveData = (req, res) => {
           );
           empModel.instructorImage.contentType = file.instructorImage.type;
         }
+
+        if (file.instructorSign) {
+          if (file.instructorSign.size > 3000000) {
+            return res.status(400).json({
+              error: "File size too big!",
+            });
+          }
+          empModel.instructorSign.data = fs.readFileSync(
+            file.instructorSign.path
+          );
+          empModel.instructorSign.contentType = file.instructorSign.type;
+        }
+
         empModel.save((err, data) => {
           if (err) {
             res.status(400).json({
