@@ -23,7 +23,8 @@ const auth = require("./route/auth");
 const user = require("./route/user");
 const empOfMonth = require("./route/empOfMonth");
 const testimonial = require("./route/testimonial");
-const contact = require("./route/contact")
+const contact = require("./route/contact");
+const subscription = require("./route/subscription");
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -36,6 +37,7 @@ app.use("/api", user);
 app.use("/api", empOfMonth);
 app.use("/api", testimonial);
 app.use("/api", contact);
+app.use("/api", subscription);
 
 const PORT = 8000;
 
