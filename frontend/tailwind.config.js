@@ -11,6 +11,7 @@ module.exports = {
         'servicesbg':"url('argus website/PNG/Image Thumbnail.png')",
         'jobsbg':"url('argus website/PNG/Image Thumbnail1.png')",
         'callus':"url('argus website/PNG/aboutcallusbg.png')",
+        'knowbg':"url('argus website/PNG/Group 1560.jpg')",
        }),
        colors: {
         'gray-1': '#F1F1F1',
