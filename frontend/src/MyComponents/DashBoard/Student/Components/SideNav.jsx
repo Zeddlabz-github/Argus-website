@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import Logo from './../../../../argus website/PNG/Logo Vectors.png'
 
 export default function SideNav() {
@@ -6,6 +7,7 @@ export default function SideNav() {
         <div class="mx-auto">
             <img src={Logo} alt="Argus Logo" className="mx-auto mt-10 mb-4 p-1 md:p-3"/>
             <nav className="w-11/12">
+                <Link to="/dashboard/student/home">
                 <a class="flex items-center pl-2 md:pl-4 lg:pl-10 py-3 pr-4 text-white hover:bg-white hover:text-red-1 rounded-r-full" href="#">
                 <span class="inline-block mr-3">
                     <svg class="w-5 h-5" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,6 +16,8 @@ export default function SideNav() {
                 </span>
                 <span className="hidden md:block">Dashboard</span>
                 </a>
+                </Link>
+                <Link to="/dashboard/student/calendar">
                 <a class="flex items-center pl-2 md:pl-4 lg:pl-10 py-3 pr-4 text-white hover:bg-white hover:text-red-1 rounded-r-full" href="#">
                 <span class="inline-block mr-3">
                     <svg class="w-5 h-5" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -22,6 +26,8 @@ export default function SideNav() {
                 </span>
                 <span className="hidden md:block">Calender</span>
                 </a>
+                </Link>
+                <Link to="/dashboard/student/course">
                 <a class="flex items-center pl-2 md:pl-4 lg:pl-10 py-3 pr-4 text-white hover:bg-white hover:text-red-1 rounded-r-full" href="#">
                 <span class="inline-block mr-3">
                     <svg class="w-5 h-5" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +36,8 @@ export default function SideNav() {
                 </span>
                 <span className="hidden md:block">Purchase Course</span>
                 </a>
+                </Link>
+                <Link to="/dashboard/student/training">
                 <a class="flex items-center pl-2 md:pl-4 lg:pl-10 py-3 pr-4 text-white hover:bg-white hover:text-red-1 rounded-r-full" href="#">
                 <span class="inline-block mr-3">
                     <svg class="w-5 h-5" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,6 +46,8 @@ export default function SideNav() {
                 </span>
                 <span className="hidden md:block">Training</span>
                 </a>
+                </Link>
+                <Link to="/dashboard/student/contact">
                 <a class="flex items-center pl-2 md:pl-4 lg:pl-10 py-3 pr-4 text-white hover:bg-white hover:text-red-1 rounded-r-full" href="#">
                 <span class="inline-block mr-3">
                     <svg class="w-5 h-5" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,6 +56,7 @@ export default function SideNav() {
                 </span>
                 <span className="hidden md:block">Contact</span>
                 </a>
+                </Link>
             </nav>
         </div>
     )

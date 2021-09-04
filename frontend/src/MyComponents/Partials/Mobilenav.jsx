@@ -5,14 +5,13 @@ import Hamburger from './Hamburger'
 
 const Mobilenav = ({ open }) => {
   return (
-<div class={open ? "block" : "hidden"}>
+
+
+<div className={open ? "block" : "hidden"}>
 <div class= {open ? "w-full h-screen bg-red-1 overflow-scroll " : "w-full h-screen z-30 bg-red-1 overflow-scroll "}>
   <div class="w-full">
     <div class="w-full">
       <div class="w-full flex flex-col mx-auto">
-        <Link to="/" class="mx-auto">
-          <img src={logo} alt="Logo of Argus Security Services" class="w-24 shadow-lg m-4"/>
-        </Link>
         <Link to="/about" class="w-11/12 md:w-7/12 lg:5/12 mx-auto">
           <button class="w-full p-4 my-1 mx-auto rounded-lg border text-white bg-red-700 hover:bg-white hover:text-red-700 hover:border-red-700">ABOUT</button>
         </Link>
@@ -36,8 +35,11 @@ const Mobilenav = ({ open }) => {
         <Link to="/technology" class="w-11/12 md:w-7/12 lg:5/12 mx-auto">
           <button class="w-full p-4 my-1 mx-auto rounded-lg border text-white bg-red-700 hover:bg-white hover:text-red-700 hover:border-red-700">TECHNOLOGY</button>
         </Link>
-        
-        <button class="w-11/12 md:w-7/12 lg:5/12 p-4 my-1 mx-auto rounded-lg border text-white bg-red-700 hover:bg-white hover:text-red-700 hover:border-red-700">GET YOUR SECURITY GUARD LICENSE</button>
+
+        <Link to="/training" class="w-11/12 md:w-7/12 lg:5/12 mx-auto">
+          <button class="w-full p-4 my-1 mx-auto rounded-lg border text-white bg-red-700 hover:bg-white hover:text-red-700 hover:border-red-700">GET YOUR SECURITY GUARD LICENSE</button>
+        </Link>
+
       </div>
         <h1 class="text-white text-center text-3xl my-4 sm:my-3 ">PORTALS</h1>
         <div class="w-full flex flex-row mx-auto">
@@ -51,6 +53,7 @@ const Mobilenav = ({ open }) => {
   </div>  
 </div>
 </div>
+
     )
   }
 export default Mobilenav
