@@ -5,6 +5,7 @@ import EmpOfMon from "./Components/EmpOfMon";
 import Testimonials from "./Components/Testimonial";
 import FooterControlSS from "./Components/FooterControl";
 import FooterControl from "./Components/FooterControl";
+import CompanyContact from "./../../Components/CompanyContact"
 
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
             <Testimonials />
             <EmpOfMon />
             <FooterControl />
+            <CompanyContact />
           
         </div>
 

@@ -4,6 +4,7 @@ import Header2 from "./../Partials/Header2";
 import Stickynav from "./../Partials/Stickynav";
 import MobileHeader from "../Partials/MobileHeader";
 import fleet from "./../../argus website/PNG/fleet linked in.png";
+import CompanyContact from "./../Components/CompanyContact"
 
 class Contact extends Component {
   constructor(props) {
@@ -74,19 +75,9 @@ class Contact extends Component {
                   for any delays in responding to your message.{" "}
                 </p>
                 <hr class="border-1 border-gray-600 w-11/12 my-3" />
-                <a href="tel:6472891070" class="px-2">
-                  {/* <img src={phone_logo} alt="Phone Logo" /> */}
-                  <p>647-289-1070</p>
-                </a>
-                <a href="mailto:info@argussecurityservices.ca" class="px-2">
-                  {/* <img src={phone_logo} alt="Phone Logo" /> */}
-                  <p>info@argussecurityservices.ca</p>
-                </a>
-                {/* <img src={phone_logo} alt="Phone Logo" /> */}
-                <p>
-                  350 Rutherford Road South Brampton ON L6W-4N6 Suite 210 Plaza
-                  2
-                </p>
+                
+                <CompanyContact />
+
               </div>
               <form
                 className="bg-gray-200 p-6 w-3/4"

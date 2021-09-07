@@ -15,7 +15,8 @@ module.exports = {
         'knowbg':"url('argus website/PNG/Group 1560.jpg')",
         'empofmon':"url('argus website/PNG/Overlay.png')",
         'shape':"url(argus website/SVG/5. Newsletter-svg.svg)",
-        'shape1':"url(argus website/SVG/Path 217.svg)" 
+        'shape1':"url(argus website/SVG/Path 217.svg)",
+        'siren':"url(argus website/SVG/siren.svg)" 
        }),
        colors: {
         'gray-1': '#F1F1F1',
