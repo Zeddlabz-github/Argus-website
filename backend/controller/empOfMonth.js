@@ -145,8 +145,8 @@ const getDataById = (req, res) => {
 const getPhotoById = (req, res) => {
   const url = req.params.id.split('-');
   const image = url[0];
-  const _id = url[1];
-  model.findOne({ _id  }).exec((err, data) => {
+  const id = url[1];
+  model.findOne({ _id: id  }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
@@ -224,7 +224,7 @@ const updateDataById = (req, res) => {
       !month ? (month = data.month) : month;
       !year ? (year = data.year) : year;
 
-      let empData, empType, instructorData, instructorType;
+      let empData, empType, instructorData, instructorType, instructorSignData, instructorSignType;
       if (file.empImage) {
         if (file.empImage.size > 3000000) {
           return res.status(400).json({
@@ -251,6 +251,20 @@ const updateDataById = (req, res) => {
         instructorType = data.instructorImage.contentType;
       }
 
+      if(file.instructorSign) {
+        if (file.instructorSign.size > 3000000) {
+          return res.status(400).json({
+            error: "File size too big!",
+          });
+        }
+        instructorSignData = fs.readFileSync(file.instructorSign.path);
+        instructorSignType = file.instructorSign.type;
+      } else {
+        instructorSignData = data.instructorSign.data;
+        instructorSignType = data.instructorSign.contentType;
+      }
+
+
       model
         .updateOne(
           { _id: req.params.id },
@@ -272,6 +286,10 @@ const updateDataById = (req, res) => {
                 data: instructorData,
                 contentType: instructorType,
               },
+              instructorSign: {
+                data: instructorSignData,
+                contentType: instructorSignType
+              }
             },
           }
         )
