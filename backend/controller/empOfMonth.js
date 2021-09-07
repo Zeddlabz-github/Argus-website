@@ -115,6 +115,9 @@ const getData = (req, res) => {
         logger.error(err);
       }
       if (data) {
+        data.empImage = undefined;
+        data.instructorImage = undefined;
+        data.instructorSign = undefined;
         res.send(data);
       } else {
         res.json({
@@ -140,13 +143,16 @@ const getDataById = (req, res) => {
 };
 
 const getPhotoById = (req, res) => {
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
+  const url = req.params.id.split('-');
+  const image = url[0];
+  const _id = url[1];
+  model.findOne({ _id  }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
     if (data) {
-      res.set("Content-Type", data.empImage.contentType);
-      return res.send(data.empImage.data);
+      res.set("Content-Type", data[`${image}`].contentType);
+      return res.send(data[`${image}`].data);
     } else {
       res.json({
         message: "No Record found!",

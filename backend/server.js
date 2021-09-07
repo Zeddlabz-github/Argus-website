@@ -41,7 +41,7 @@ app.use("/api", contact);
 app.use("/api", subscription);
 app.use("/api", docs);
 
-const PORT = 8000;
+const PORT = 8001;
 
 app.listen(PORT, () => {
   logger.info("Listening on port", PORT);
