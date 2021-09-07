@@ -33,7 +33,7 @@ const updateData = (req, res) => {
       let id = data._id;
       let phNo = req.body.phoneNumber,
         email = req.body.email,
-        address = req.body.email;
+        address = req.body.address;
       if (req.body.phoneNumber === undefined) {
         phNo = defaultData.phoneNumber;
       }

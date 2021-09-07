@@ -139,6 +139,22 @@ const getDataById = (req, res) => {
   });
 };
 
+const getPhotoById = (req, res) => {
+  model.findOne({ _id: req.params.id }).exec((err, data) => {
+    if (err) {
+      logger.error(err);
+    }
+    if (data) {
+      res.set("Content-Type", data.empImage.contentType);
+      return res.send(data.empImage.data);
+    } else {
+      res.json({
+        message: "No Record found!",
+      });
+    }
+  });
+}
+
 const getDataByMonth = (req, res) => {
   model.findOne({ month: req.params.month }).exec((err, data) => {
     if (err) {
@@ -289,6 +305,7 @@ module.exports = {
   getData,
   getDataById,
   getDataByMonth,
+  getPhotoById,
   getAllData,
   updateDataById,
   deleteDataById,

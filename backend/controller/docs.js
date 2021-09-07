@@ -213,9 +213,7 @@ const updateData = (req, res) => {
   });
 };
 
-const getData = (req, res) => {
-  const userId = req.auth._id;
-  logger.info(userId);
+const handleGet = (model, userId, res) => {
   model.findOne({ userId }).exec((err, data) => {
     if (err) {
       logger.error(err);
@@ -228,6 +226,18 @@ const getData = (req, res) => {
       });
     }
   });
+};
+
+const getData = (req, res) => {
+  const userId = req.auth._id;
+
+  if (req.path.includes('/doc1')) {
+    handleGet(Doc1, userId, res);
+  } else if (req.path.includes('/doc2')) {
+    handleGet(Doc2, userId, res);
+  } else if (req.path.includes('/doc3')) {
+    handleGet(Doc3, userId, res);
+  }
 };
 
 const getDataById = (req, res) => {

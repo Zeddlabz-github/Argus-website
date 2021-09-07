@@ -12,12 +12,14 @@ const {
   deleteDataById,
   getAllData,
   updateDataById,
+  getPhotoById,
 } = require("../controller/empOfMonth");
 const { isSignedIn, isValidToken, isAdmin } = require("../controller/auth");
 
 router.post("/eom/create", saveData);
 router.get("/eom/get", getData);
 router.get("/eom/get-id/:id", getDataById);
+router.get("/eom/get-photo/:id", getPhotoById);
 router.get("/eom/get-month/:month", getDataByMonth);
 router.get("/eom/get-all", isSignedIn, isValidToken, isAdmin, getAllData);
 router.put(
