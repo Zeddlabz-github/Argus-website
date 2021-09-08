@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { isAuthenticated } from '../../../../helpers/auth';
 import { updateContact } from '../../../../helpers/contact';
+import CompanyContact from './../../../Components/CompanyContact';
 
  const FooterControl = () => {
   const [data, setData] = useState({
@@ -64,10 +65,11 @@ import { updateContact } from '../../../../helpers/contact';
                 </svg>
                 <h1 className="text-sm font-bold text-black p-2"> Update Contact Information.</h1>
               </div>
-              <form className="flex flex-col items-center py-4" onSubmit = {handleSubmit}>
+              <div className="flex flex-col md:flex-row">
+              <form className="flex flex-col items-center py-4 w-full md:w-6/12" onSubmit = {handleSubmit}>
                 <input
                   className="w-full border-b border-black focus:outline-none my-2"
-                  type="text"
+                  type="number"
                   placeholder="Phone Number"
                   value = {phoneNumber}
                   onChange = {handlePhoneNumberChange}
@@ -90,6 +92,10 @@ import { updateContact } from '../../../../helpers/contact';
                   Update
                 </button>
               </form>
+                <div className="w-full md:w-6/12 px-6 border-2 border-red-1 mx-auto">
+                  <CompanyContact />
+                </div>
+              </div>
 
         </div>
     )

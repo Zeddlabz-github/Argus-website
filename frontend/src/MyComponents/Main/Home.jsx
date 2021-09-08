@@ -34,12 +34,12 @@ export default function Home() {
         <img
           src={HeroImage}
           alt=""
-          className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 z-0"
+          className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48"
         />
       </div>
 
       {/* Section 2 CAll Us */}
-      <div className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 mx-auto z-0">
+      <div className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end mx-auto">
           <h1 className="flex-grow sm:pr-16 text-4xl font-bold font-for-para text-gray-400">
             Call Us <br />
@@ -195,11 +195,11 @@ export default function Home() {
           <div className="p-4 md:w-1/3">
             <div className="h-full overflow-hidden ">
               <img
-                className="lg:h-64 md:h-36 w-full object-cover object-center transform hover:scale-110 duration-300 z-10"
+                className="lg:h-64 md:h-36 w-full object-cover object-center transform hover:scale-110 duration-300"
                 src={image1}
                 alt="blog"
               />
-              <div className="bg-white border-6 hover:bg-gray-200 duration-500 z-50">
+              <div className="bg-white border-6 hover:bg-gray-200 duration-500">
                 <h1 className="title-font text-lg font-medium text-white p-3 mb-3 bg-center bg-no-repeat bg-shape1">
                   GATED COMMUNITY
                 </h1>

@@ -7,16 +7,14 @@ const Imagehelper = ({param, id }) => {
 		? `${API}/${param}/get-photo/${id}`
 		: "";
 	return (
-		<div className='rounded border border-success p-2' style = {
+		<div className='' style = {
 			{
-				height : "250px"
+
 			}
 		}> 
 			<img
 				src={imageUrl}
 				alt='photo'
-				style={{ maxHeight: "100%", maxWidth: "100%" }}
-				className='mb-3 rounded'
 			/>
 		</div>
 	);
