@@ -8,7 +8,7 @@ const {
   uploadData,
   updateData,
   getData,
-  getPhoto,
+  getDoc,
   deleteDataById,
   deleteDocs,
 } = require('../controller/docs');
@@ -17,7 +17,7 @@ const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth');
 router.post('/docs/upload', isSignedIn, isValidToken, uploadData);
 router.put('/docs/update', isSignedIn, isValidToken, updateData);
 router.get('/docs/get', isSignedIn, isValidToken, getData);
-router.get('/docs/get-photo/:id', isSignedIn, isValidToken, getPhoto);
+router.get('/docs/get-doc/:id', isSignedIn, isValidToken, getDoc);
 router.delete(
   '/docs/delete/:id',
   isSignedIn,

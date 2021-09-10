@@ -151,7 +151,7 @@ const getData = (req, res) => {
   });
 };
 
-const getPhoto = (req, res) => {
+const getDoc = (req, res) => {
   const userId = req.auth._id;
   const doc = req.params.id;
   model.findOne({ userId }).exec((err, data) => {
@@ -238,7 +238,7 @@ module.exports = {
   uploadData,
   updateData,
   getData,
-  getPhoto,
+  getDoc,
   deleteDataById,
   deleteDocs,
 };
