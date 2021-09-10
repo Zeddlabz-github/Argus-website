@@ -1,10 +1,10 @@
-const User = require("../model/user");
+const User = require('../model/user');
 
 const getUserById = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
     if (err || !user) {
       return res.status(400).json({
-        error: "No user was found in DB",
+        error: 'No user was found in DB',
       });
     }
     req.profile = user;
@@ -24,7 +24,7 @@ const getAllUsers = (req, res) => {
   User.find().exec((err, user) => {
     if (err || !user) {
       return res.status(400).json({
-        error: "No users were found in a DB!",
+        error: 'No users were found in a DB!',
       });
     }
     res.json(user);

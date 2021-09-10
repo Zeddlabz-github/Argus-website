@@ -7,12 +7,12 @@ const formidable = require('formidable');
 const fs = require('fs');
 const _ = require('lodash');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+let log4js = require('log4js');
+let logger = log4js.getLogger();
 logger.level = 'debug';
 
 const getObjSize = (obj) => {
-  var size = 0,
+  let size = 0,
     key;
   for (key in obj) {
     if (obj.hasOwnProperty(key)) size++;
@@ -138,10 +138,10 @@ const getData = (req, res) => {
     }
     if (data) {
       _.forIn(data, (value, key) => {
-        if(key.includes('doc')) {
+        if (key.includes('doc')) {
           data[`${key}`].data = undefined;
         }
-      })
+      });
       res.send(data);
     } else {
       res.json({

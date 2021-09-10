@@ -2,20 +2,22 @@
  * @author krish
  */
 
-const model = require("../model/empOfMonth");
-const formidable = require("formidable");
-const fs = require("fs");
+const model = require('../model/empOfMonth');
+const formidable = require('formidable');
+const fs = require('fs');
+const _ = require('lodash');
 
-var log4js = require("log4js");
-var logger = log4js.getLogger();
-logger.level = "debug";
+const log4js = require('log4js');
+const logger = log4js.getLogger();
+logger.level = 'debug';
+
+const month = new Date().getMonth() + 1;
+const year = new Date().getFullYear();
 
 const saveData = (req, res) => {
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
 
-  let month = new Date().getMonth() + 1;
-  let year = new Date().getFullYear();
   model.findOne({ month: month, year: year }).exec((err, data) => {
     if (err) {
       logger.error(err);
@@ -23,13 +25,13 @@ const saveData = (req, res) => {
     if (data) {
       res.json({
         error:
-          "Employee of this month is already available on the database, Kindly delete it to create a new one",
+          'Employee of this month is already available on the database, Kindly delete it to create a new one',
       });
     } else {
       form.parse(req, (err, fields, file) => {
         if (err) {
           return res.status(400).json({
-            error: "problem with image",
+            error: 'problem with image',
           });
         }
         let {
@@ -50,55 +52,35 @@ const saveData = (req, res) => {
           !instructorRole
         ) {
           return res.status(400).json({
-            error: "Please include all fields",
+            error: 'Please include all fields',
           });
         }
-        skills = skills.split(",");
+        skills = skills.split(',');
 
         let empModel = new model(fields);
         empModel.month = month;
         empModel.year = year;
 
-        if (file.empImage) {
-          if (file.empImage.size > 3000000) {
+        _.forIn(file, (value, key) => {
+          if (value.size > 3000000) {
             return res.status(400).json({
-              error: "File size too big!",
+              error: 'File size too big!',
             });
           }
-          empModel.empImage.data = fs.readFileSync(file.empImage.path);
-          empModel.empImage.contentType = file.empImage.type;
-        }
-
-        if (file.instructorImage) {
-          if (file.instructorImage.size > 3000000) {
-            return res.status(400).json({
-              error: "File size too big!",
-            });
-          }
-          empModel.instructorImage.data = fs.readFileSync(
-            file.instructorImage.path
-          );
-          empModel.instructorImage.contentType = file.instructorImage.type;
-        }
-
-        if (file.instructorSign) {
-          if (file.instructorSign.size > 3000000) {
-            return res.status(400).json({
-              error: "File size too big!",
-            });
-          }
-          empModel.instructorSign.data = fs.readFileSync(
-            file.instructorSign.path
-          );
-          empModel.instructorSign.contentType = file.instructorSign.type;
-        }
+          empModel[`${key}`].name = value.name;
+          empModel[`${key}`].data = fs.readFileSync(value.path);
+          empModel[`${key}`].contentType = value.type;
+        });
 
         empModel.save((err, data) => {
           if (err) {
             res.status(400).json({
-              error: "Saving data in DB failed",
+              error: 'Saving data in DB failed',
             });
           }
+          data.empImage = undefined;
+          data.instructorSign = undefined;
+          data.instructorImage = undefined;
           res.json(data);
         });
       });
@@ -108,8 +90,7 @@ const saveData = (req, res) => {
 
 const getData = (req, res) => {
   model
-    .findOne({})
-    .sort({ _id: -1 })
+    .findOne({month})
     .exec((err, data) => {
       if (err) {
         logger.error(err);
@@ -121,7 +102,7 @@ const getData = (req, res) => {
         res.send(data);
       } else {
         res.json({
-          message: "No Record found!",
+          message: 'No Record found!',
         });
       }
     });
@@ -136,30 +117,30 @@ const getDataById = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
 };
 
-const getPhotoById = (req, res) => {
+const getPhoto = (req, res) => {
   const url = req.params.id.split('-');
   const image = url[0];
   const id = url[1];
-  model.findOne({ _id: id  }).exec((err, data) => {
+  model.findOne({ _id: id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
     if (data) {
-      res.set("Content-Type", data[`${image}`].contentType);
+      res.set('Content-Type', data[`${image}`].contentType);
       return res.send(data[`${image}`].data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
-}
+};
 
 const getDataByMonth = (req, res) => {
   model.findOne({ month: req.params.month }).exec((err, data) => {
@@ -170,7 +151,7 @@ const getDataByMonth = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -185,7 +166,7 @@ const getAllData = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -201,7 +182,7 @@ const updateDataById = (req, res) => {
     form.parse(req, (err, fields, file) => {
       if (err) {
         return res.status(400).json({
-          error: "problem with image",
+          error: 'problem with image',
         });
       }
       let {
@@ -217,18 +198,23 @@ const updateDataById = (req, res) => {
 
       !empName ? (empName = data.empName) : empName;
       !empDesc ? (empDesc = data.empDesc) : empDesc;
-      !skills ? (skills = data.skills) : skills.split(",");
+      !skills ? (skills = data.skills) : skills.split(',');
       !description ? (description = data.description) : description;
       !instructorName ? (instructorName = data.instructorName) : instructorName;
       !instructorRole ? (instructorRole = data.instructorRole) : instructorRole;
       !month ? (month = data.month) : month;
       !year ? (year = data.year) : year;
 
-      let empData, empType, instructorData, instructorType, instructorSignData, instructorSignType;
+      let empData,
+        empType,
+        instructorData,
+        instructorType,
+        instructorSignData,
+        instructorSignType;
       if (file.empImage) {
         if (file.empImage.size > 3000000) {
           return res.status(400).json({
-            error: "File size too big!",
+            error: 'File size too big!',
           });
         }
         empData = fs.readFileSync(file.empImage.path);
@@ -241,7 +227,7 @@ const updateDataById = (req, res) => {
       if (file.instructorImage) {
         if (file.instructorImage.size > 3000000) {
           return res.status(400).json({
-            error: "File size too big!",
+            error: 'File size too big!',
           });
         }
         instructorData = fs.readFileSync(file.instructorImage.path);
@@ -251,10 +237,10 @@ const updateDataById = (req, res) => {
         instructorType = data.instructorImage.contentType;
       }
 
-      if(file.instructorSign) {
+      if (file.instructorSign) {
         if (file.instructorSign.size > 3000000) {
           return res.status(400).json({
-            error: "File size too big!",
+            error: 'File size too big!',
           });
         }
         instructorSignData = fs.readFileSync(file.instructorSign.path);
@@ -263,7 +249,6 @@ const updateDataById = (req, res) => {
         instructorSignData = data.instructorSign.data;
         instructorSignType = data.instructorSign.contentType;
       }
-
 
       model
         .updateOne(
@@ -288,19 +273,19 @@ const updateDataById = (req, res) => {
               },
               instructorSign: {
                 data: instructorSignData,
-                contentType: instructorSignType
-              }
+                contentType: instructorSignType,
+              },
             },
           }
         )
         .then(() => {
           res.json({
-            message: "User Updated Successfully!",
+            message: 'User Updated Successfully!',
           });
         })
         .catch(() => {
           res.json({
-            error: "User Updation Failed!",
+            error: 'User Updation Failed!',
           });
         });
     });
@@ -314,11 +299,11 @@ const deleteDataById = (req, res) => {
     }
     if (data) {
       res.json({
-        message: "Document deleted successfully!",
+        message: 'Document deleted successfully!',
       });
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -329,7 +314,7 @@ module.exports = {
   getData,
   getDataById,
   getDataByMonth,
-  getPhotoById,
+  getPhoto,
   getAllData,
   updateDataById,
   deleteDataById,

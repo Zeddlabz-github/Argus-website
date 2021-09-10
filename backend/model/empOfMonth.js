@@ -4,25 +4,55 @@
 
 const mongoose = require("mongoose");
 
-var schema = new mongoose.Schema(
+let schema = new mongoose.Schema(
   {
     empName: String,
-    empImage: {
-      data: Buffer,
-      contentType: String,
-    },
     empDesc: String,
     skills: Array,
     description: String,
     instructorName: String,
     instructorRole: String,
+    empImage: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
     instructorImage: {
-      data: Buffer,
-      contentType: String,
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
     },
     instructorSign: {
-      data: Buffer,
-      contentType: String,
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
     },
     month: {
       type: Number,

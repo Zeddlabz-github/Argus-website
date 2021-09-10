@@ -2,13 +2,13 @@
  * @author krish
  */
 
-const model = require("../model/testimonial");
-const formidable = require("formidable");
-const fs = require("fs");
+const model = require('../model/testimonial');
+const formidable = require('formidable');
+const fs = require('fs');
 
-var log4js = require("log4js");
-var logger = log4js.getLogger();
-logger.level = "debug";
+let log4js = require('log4js');
+let logger = log4js.getLogger();
+logger.level = 'debug';
 
 const saveData = (req, res) => {
   let form = new formidable.IncomingForm();
@@ -16,14 +16,14 @@ const saveData = (req, res) => {
   form.parse(req, (err, fields, file) => {
     if (err) {
       return res.status(400).json({
-        error: "problem with image",
+        error: 'problem with image',
       });
     }
     let { name, role, description } = fields;
 
     if (!name || !role || !description) {
       return res.status(400).json({
-        error: "Please include all fields",
+        error: 'Please include all fields',
       });
     }
 
@@ -32,7 +32,7 @@ const saveData = (req, res) => {
     if (file.photo) {
       if (file.photo.size > 3000000) {
         return res.status(400).json({
-          error: "File size too big!",
+          error: 'File size too big!',
         });
       }
       testimonialModel.photo.data = fs.readFileSync(file.photo.path);
@@ -41,7 +41,7 @@ const saveData = (req, res) => {
     testimonialModel.save((err, data) => {
       if (err) {
         res.status(400).json({
-          error: "Saving data in DB failed",
+          error: 'Saving data in DB failed',
         });
       }
       res.json(data);
@@ -58,7 +58,7 @@ const getDataById = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -70,10 +70,28 @@ const getAllData = (req, res) => {
       logger.error(err);
     }
     if (data) {
+      data?.forEach((ele) => ele.photo = undefined)
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
+      });
+    }
+  });
+};
+
+const getPhoto = (req, res) => {
+  const id = req.params.id;
+  model.findOne({ _id: id }).exec((err, data) => {
+    if (err) {
+      logger.error(err);
+    }
+    if (data) {
+      res.set('Content-Type', data.photo.contentType);
+      return res.send(data.photo.data);
+    } else {
+      res.json({
+        message: 'No Record found!',
       });
     }
   });
@@ -89,7 +107,7 @@ const updateDataById = (req, res) => {
     form.parse(req, (err, fields, file) => {
       if (err) {
         return res.status(400).json({
-          error: "problem with image",
+          error: 'problem with image',
         });
       }
       let { name, role, description, isApproved, priority } = fields;
@@ -104,7 +122,7 @@ const updateDataById = (req, res) => {
       if (file.photo) {
         if (file.photo.size > 3000000) {
           return res.status(400).json({
-            error: "File size too big!",
+            error: 'File size too big!',
           });
         }
         data = fs.readFileSync(file.photo.path);
@@ -133,12 +151,12 @@ const updateDataById = (req, res) => {
         )
         .then(() => {
           res.json({
-            message: "User Updated Successfully!",
+            message: 'User Updated Successfully!',
           });
         })
         .catch(() => {
           res.json({
-            error: "User Updation Failed!",
+            error: 'User Updation Failed!',
           });
         });
     });
@@ -152,11 +170,11 @@ const deleteDataById = (req, res) => {
     }
     if (data) {
       res.json({
-        message: "Document deleted successfully!",
+        message: 'Document deleted successfully!',
       });
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -166,6 +184,7 @@ module.exports = {
   saveData,
   getDataById,
   getAllData,
+  getPhoto,
   updateDataById,
   deleteDataById,
 };

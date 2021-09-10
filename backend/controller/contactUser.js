@@ -4,8 +4,8 @@
 
 const model = require('../model/contactUser');
 
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+let log4js = require('log4js');
+let logger = log4js.getLogger();
 logger.level = 'debug';
 
 const saveData = (req, res) => {

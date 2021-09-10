@@ -2,14 +2,12 @@
  * @author krish
  */
 
-const model = require("../model/contact");
-const formidable = require("formidable");
-const fs = require("fs");
-const { validationResult } = require("express-validator");
+const model = require('../model/contact');
+const { validationResult } = require('express-validator');
 
-var log4js = require("log4js");
-var logger = log4js.getLogger();
-logger.level = "debug";
+let log4js = require('log4js');
+let logger = log4js.getLogger();
+logger.level = 'debug';
 
 const updateData = (req, res) => {
   const errors = validationResult(req);
@@ -18,12 +16,12 @@ const updateData = (req, res) => {
       error: errors.array()[0].msg,
     });
   }
-  var defaultData = {
-    phoneNumber: "647.289.1070",
+  let defaultData = {
+    phoneNumber: '647.289.1070',
     address: `350 Rutherford Road South 
         Brampton ON L6W-4N6 
         Suite 210 Plaza 2`,
-    email: "info@argussecurityservices.ca",
+    email: 'info@argussecurityservices.ca',
   };
   model.findOne({}).exec((err, data) => {
     if (err) {
@@ -57,7 +55,7 @@ const updateData = (req, res) => {
         )
         .then(() => {
           res.json({
-            message: "Contact Updated Successfully!",
+            message: 'Contact Updated Successfully!',
             data: {
               phoneNumber: phNo,
               email: email,
@@ -67,7 +65,7 @@ const updateData = (req, res) => {
         })
         .catch(() => {
           res.json({
-            error: "Contact Updation Failed!",
+            error: 'Contact Updation Failed!',
           });
         });
     } else {
@@ -75,7 +73,7 @@ const updateData = (req, res) => {
       contactModel.save((err, data) => {
         if (err) {
           res.status(400).json({
-            error: "Saving data in DB failed",
+            error: 'Saving data in DB failed',
           });
         }
         res.json(data);
@@ -93,7 +91,7 @@ const getData = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });

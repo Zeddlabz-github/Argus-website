@@ -12,8 +12,8 @@ dotenv.config();
 const app = express();
 
 //logger
-var log4js = require("log4js");
-var logger = log4js.getLogger();
+let log4js = require("log4js");
+let logger = log4js.getLogger();
 logger.level = "debug";
 
 mongo();

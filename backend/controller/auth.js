@@ -2,11 +2,11 @@
  * @author krish
  */
 
-const User = require("../model/user.js");
-const { validationResult } = require("express-validator");
-var jwt = require("jsonwebtoken");
-var expressJwt = require("express-jwt");
-const user = require("../model/user.js");
+const User = require('../model/user.js');
+const { validationResult } = require('express-validator');
+let jwt = require('jsonwebtoken');
+let expressJwt = require('express-jwt');
+const user = require('../model/user.js');
 
 const signup = async (req, res) => {
   const errors = validationResult(req);
@@ -22,15 +22,15 @@ const signup = async (req, res) => {
   await User.findOne({ email }, (err, user) => {
     if (err || user) {
       return res.status(400).json({
-        error: "E-Mail already has been registered",
-        suggestion: "Try some other E-mail",
+        error: 'E-Mail already has been registered',
+        suggestion: 'Try some other E-mail',
       });
     } else {
       const user = new User(req.body);
       user.save((err, user) => {
         if (err) {
           return res.status(400).json({
-            err: "Failed to add user in DB",
+            err: 'Failed to add user in DB',
           });
         }
         res.json({
@@ -64,13 +64,13 @@ const update = async (req, res) => {
   } = req.body;
   if (name === undefined && lastname === undefined && phone === undefined) {
     res.json({
-      message: "Enter atleast one updation field",
+      message: 'Enter atleast one updation field',
     });
   } else {
     await user.findOne({ _id: id }).exec((err, data) => {
       if (err || !data) {
         return res.status(400).json({
-          error: "User Not Found!",
+          error: 'User Not Found!',
         });
       }
       //personal info
@@ -166,12 +166,12 @@ const update = async (req, res) => {
         )
         .then(() => {
           res.json({
-            message: "User Updated Successfully!",
+            message: 'User Updated Successfully!',
           });
         })
         .catch(() => {
           res.json({
-            error: "User Updation Failed!",
+            error: 'User Updation Failed!',
           });
         });
     });
@@ -197,17 +197,17 @@ const signin = async (req, res) => {
     }
     if (!user.authenticate(password)) {
       return res.status(401).json({
-        error: "E-mail and Password does not match",
+        error: 'E-mail and Password does not match',
       });
     }
 
-    var expiryTime = new Date();
+    let expiryTime = new Date();
     expiryTime.setMonth(expiryTime.getMonth() + 6);
     const exp = parseInt(expiryTime.getTime() / 1000);
 
     const token = jwt.sign({ _id: user._id, exp: exp }, process.env.SECRET);
 
-    res.cookie("Token", token, { expire: new Date() + 9999 });
+    res.cookie('Token', token, { expire: new Date() + 9999 });
 
     user.salt = undefined;
     user.__v = undefined;
@@ -216,23 +216,23 @@ const signin = async (req, res) => {
 };
 
 const signout = (req, res) => {
-  res.clearCookie("Token");
+  res.clearCookie('Token');
 
   res.json({
-    message: "User Signed Out Sucessfully",
+    message: 'User Signed Out Sucessfully',
   });
 };
 
 const isSignedIn = expressJwt({
   secret: process.env.SECRET,
-  algorithms: ["HS256", "RS256"],
-  userProperty: "auth",
+  algorithms: ['HS256', 'RS256'],
+  userProperty: 'auth',
 });
 
 //middlewares
 const isValidToken = (err, req, res, next) => {
-  if (err.name === "UnauthorizedError") {
-    return res.status(401).json({ error: "Authentication Failed" });
+  if (err.name === 'UnauthorizedError') {
+    return res.status(401).json({ error: 'Authentication Failed' });
   }
   next();
 };
@@ -242,7 +242,7 @@ const isAuthenticated = (req, res, next) => {
 
   if (!checker) {
     return res.status(403).json({
-      error: "ACCESS DENIED",
+      error: 'ACCESS DENIED',
     });
   }
   next();
@@ -255,14 +255,14 @@ const isAdmin = (req, res, next) => {
     User.findById(authId).exec((err, user) => {
       if (err || !user) {
         return res.status(400).json({
-          error: "No user was found in DB",
+          error: 'No user was found in DB',
         });
       }
       if (user.role === 2 || user.role === 3) {
         next();
       } else {
         return res.status(401).json({
-          error: "Not an admin",
+          error: 'Not an admin',
         });
       }
     });

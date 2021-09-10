@@ -10,6 +10,7 @@ const {
   getDataById,
   updateDataById,
   deleteDataById,
+  getPhoto,
 } = require("../controller/testimonial");
 const { isSignedIn, isValidToken, isAdmin } = require("../controller/auth");
 
@@ -23,6 +24,7 @@ router.put(
   isAdmin,
   updateDataById
 );
+router.get('/testimonal/get-photo/:id', getPhoto);
 router.delete(
   "/testimonial/delete/:id",
   isSignedIn,

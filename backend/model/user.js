@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 const { v1: uuidv1 } = require("uuid");
 
-var schema = new mongoose.Schema(
+let schema = new mongoose.Schema(
   {
     //personal info
     name: {

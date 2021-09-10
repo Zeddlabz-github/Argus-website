@@ -2,12 +2,12 @@
  * @author krish
  */
 
-const model = require("../model/subscription");
-const { validationResult } = require("express-validator");
+const model = require('../model/subscription');
+const { validationResult } = require('express-validator');
 
-var log4js = require("log4js");
-var logger = log4js.getLogger();
-logger.level = "debug";
+let log4js = require('log4js');
+let logger = log4js.getLogger();
+logger.level = 'debug';
 
 const saveData = (req, res) => {
   const errors = validationResult(req);
@@ -20,7 +20,7 @@ const saveData = (req, res) => {
 
   if (!email) {
     res.json({
-      error: "Please Include E-Mail",
+      error: 'Please Include E-Mail',
     });
   } else {
     let result = {
@@ -36,14 +36,14 @@ const saveData = (req, res) => {
         subscriptionModel.save((err, data) => {
           if (err) {
             res.status(400).json({
-              error: "Saving data in DB failed",
+              error: 'Saving data in DB failed',
             });
           }
           res.json(data);
         });
       } else {
         res.json({
-          message: "Email is Already stored in DB!",
+          message: 'Email is Already stored in DB!',
         });
       }
     });
@@ -59,7 +59,7 @@ const getDataById = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -74,7 +74,7 @@ const getAllData = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -94,7 +94,7 @@ const updateDataById = (req, res) => {
     let { email, isApproved } = req.body;
     if (data.email === email) {
       return res.json({
-        error: "Please enter different E-Mail address to update",
+        error: 'Please enter different E-Mail address to update',
       });
     }
     !email ? (email = data.email) : email;
@@ -112,13 +112,13 @@ const updateDataById = (req, res) => {
       )
       .then(() => {
         res.json({
-          message: "User Updated Successfully!",
+          message: 'User Updated Successfully!',
         });
       })
       .catch((err) => {
         logger.error(err);
         res.json({
-          error: "User Updation Failed!",
+          error: 'User Updation Failed!',
         });
       });
   });
@@ -131,11 +131,11 @@ const deleteDataById = (req, res) => {
     }
     if (data) {
       res.json({
-        message: "Document deleted successfully!",
+        message: 'Document deleted successfully!',
       });
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
