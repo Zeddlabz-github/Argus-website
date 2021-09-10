@@ -5,17 +5,13 @@
 const model = require('../model/docs');
 const formidable = require('formidable');
 const fs = require('fs');
-
-const Doc1 = require('../model/doc1');
-const Doc2 = require('../model/doc2');
-const Doc3 = require('../model/doc3');
+const _ = require('lodash');
 
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 logger.level = 'debug';
 
-//to find an object size
-Object.size = function (obj) {
+const getObjSize = (obj) => {
   var size = 0,
     key;
   for (key in obj) {
@@ -24,46 +20,8 @@ Object.size = function (obj) {
   return size;
 };
 
-//handles files and stores in db
-const handleUpload = (file, doc, Model, model, userId, res) => {
-  Model.findOne({ userId }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if (data) {
-      logger.info(`${doc} is already available for this user`);
-      res.status(400).json({
-        error: `${doc} is already available for this user`,
-      });
-    } else {
-      if (file[`${doc}`].size > 3000000) {
-        logger.info(`File size is too big for ${doc}`);
-        res.status(400).json({
-          error: `File size is too big for ${doc}`,
-        });
-      } else {
-        model.userId = userId;
-        model.doc.name = file[`${doc}`].name;
-        model.doc.data = fs.readFileSync(file[`${doc}`].path, 'base64');
-        model.doc.contentType = file[`${doc}`].type;
-
-        model.save((err, data) => {
-          if (err) {
-            logger.error(err);
-          }
-          logger.info(`${doc} saved successfully!`);
-          res.status(200).json({
-            message: `${doc} saved successfully!`,
-          });
-        });
-      }
-    }
-  });
-};
-
 const uploadData = (req, res) => {
   const userId = req.auth._id;
-
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.parse(req, (err, fields, file) => {
@@ -72,98 +30,44 @@ const uploadData = (req, res) => {
         error: 'problem with image',
       });
     }
-    if (Object.size(file) === 1) {
-      if (file.doc1) {
-        const docsModel = new Doc1();
-        handleUpload(
-          (file = file),
-          (doc = 'doc1'),
-          (Model = Doc1),
-          docsModel,
-          userId,
-          res
-        );
+    model.findOne({ userId }).exec((err, data) => {
+      if (err) {
+        logger.error(err);
       }
-      if (file.doc2) {
-        const docsModel = new Doc2();
-        handleUpload(
-          (file = file),
-          (doc = 'doc2'),
-          (Model = Doc2),
-          docsModel,
-          userId,
-          res
-        );
-      }
-      if (file.doc3) {
-        const docsModel = new Doc3();
-        handleUpload(
-          (file = file),
-          (doc = 'doc3'),
-          (Model = Doc3),
-          docsModel,
-          userId,
-          res
-        );
-      }
-    } else {
-      res.status(400).json({
-        error: 'Upload only one file at a time',
-      });
-    }
-  });
-};
-
-const handleUpdate = (Model, file, doc, userId, res) => {
-  Model.findOne({ userId }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if (data) {
-      let name, fileData, contentType;
-      console.log(file);
-      if (file[`${doc}`] && file[`${doc}`].type) {
-        if (file[`${doc}`].size > 3000000) {
-          logger.info(`File size is too big for ${doc}`);
-          return res.status(400).json({
-            error: `File size is too big for ${doc}`,
-          });
-        }
-        name = file[`${doc}`].name;
-        fileData = fs.readFileSync(file[`${doc}`].path, 'base64');
-        contentType = file[`${doc}`].type;
-      } else {
-        name = data.doc.name;
-        fileData = data.doc.data;
-        contentType = data.doc.contentType;
-      }
-      Model.updateOne(
-        { userId },
-        {
-          $set: {
-            doc: {
-              name,
-              data: fileData,
-              contentType,
-            },
-          },
-        }
-      )
-        .then(() => {
-          res.json({
-            message: `${doc} Updated Successfully!`,
-          });
-        })
-        .catch(() => {
-          res.json({
-            error: `${doc} Updated Failed!`,
-          });
+      if (data) {
+        res.status(400).json({
+          error: 'Document is already available for this user',
         });
-    } else {
-      res.status(404).json({
-        error: 'No Documents found for this user!',
-      });
-    }
+      } else {
+        if (getObjSize(file)) {
+          let savedDoc = 0;
+          const newModel = new model();
+          newModel.userId = userId;
+          _.forIn(file, (value, key) => {
+            if (value.size > 3000000) {
+              logger.info(`File size is too big for ${doc}`);
+            } else {
+              savedDoc++;
+              newModel[key].name = value.name;
+              newModel[key].data = fs.readFileSync(value.path);
+              newModel[key].contentType = value.type;
+            }
+          });
+          newModel.save((err, data) => {
+            if (err) {
+              logger.error(err);
+            }
+            res.status(200).json({
+              message: `${savedDoc} Document saved successfully!`,
+            });
+          });
+        } else {
+          res.status(404).json({
+            message: 'File Not Found',
+          });
+        }
+      }
+    });
   });
 };
 
@@ -177,75 +81,67 @@ const updateData = (req, res) => {
         error: 'problem with image',
       });
     }
-    if (Object.size(file) === 1) {
-      if (file.doc1) {
-        handleUpdate(
-          (Model = Doc1),
-          (file = file),
-          (doc = 'doc1'),
-          userId,
-          res
-        );
+    model.findOne({ userId }).exec((err, data) => {
+      if (err) {
+        logger.error(err);
       }
-      if (file.doc2) {
-        handleUpdate(
-          (Model = Doc2),
-          (file = file),
-          (doc = 'doc2'),
-          userId,
-          res
-        );
+      if (data) {
+        let fileName, fileData, fileType;
+        if (getObjSize(file)) {
+          let savedDoc = 0;
+          _.forIn(file, (value, key) => {
+            if (value.size > 3000000) {
+              logger.info(`File size is too big for ${doc}`);
+            } else {
+              fileName = value.name;
+              fileData = fs.readFileSync(value.path);
+              fileType = value.type;
+              savedDoc++;
+              model
+                .updateOne(
+                  { userId },
+                  {
+                    $set: {
+                      [key]: {
+                        name: fileName,
+                        data: fileData,
+                        contentType: fileType,
+                      },
+                    },
+                  }
+                )
+                .then(() => null);
+            }
+          });
+          res.status(200).json({
+            message: `${savedDoc} documents updated succesfully!`,
+          });
+        } else {
+          res.status(404).json({
+            message: 'File Not Found',
+          });
+        }
+      } else {
+        res.status(404).json({
+          error: 'No Documents found for this user!',
+        });
       }
-      if (file.doc3) {
-        handleUpdate(
-          (Model = Doc3),
-          (file = file),
-          (doc = 'doc3'),
-          userId,
-          res
-        );
-      }
-    } else {
-      res.status(400).json({
-        error: 'Upload only one file at a time',
-      });
-    }
-  });
-};
-
-const handleGet = (model, userId, res) => {
-  model.findOne({ userId }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if (data) {
-      res.send(data);
-    } else {
-      res.json({
-        message: 'No Record found!',
-      });
-    }
+    });
   });
 };
 
 const getData = (req, res) => {
   const userId = req.auth._id;
-
-  if (req.path.includes('/doc1')) {
-    handleGet(Doc1, userId, res);
-  } else if (req.path.includes('/doc2')) {
-    handleGet(Doc2, userId, res);
-  } else if (req.path.includes('/doc3')) {
-    handleGet(Doc3, userId, res);
-  }
-};
-
-const getDataById = (req, res) => {
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
+  model.findOne({ userId }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
     if (data) {
+      _.forIn(data, (value, key) => {
+        if(key.includes('doc')) {
+          data[`${key}`].data = undefined;
+        }
+      })
       res.send(data);
     } else {
       res.json({
@@ -255,13 +151,22 @@ const getDataById = (req, res) => {
   });
 };
 
-const getAllData = (req, res) => {
-  model.find({}).exec((err, data) => {
+const getPhoto = (req, res) => {
+  const userId = req.auth._id;
+  const doc = req.params.id;
+  model.findOne({ userId }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
     if (data) {
-      res.send(data);
+      if (data[`${doc}`].data !== null) {
+        res.set('Content-Type', data[`${doc}`].contentType);
+        res.send(data[`${doc}`].data);
+      } else {
+        res.status(404).json({
+          message: 'Photo Not Found!',
+        });
+      }
     } else {
       res.json({
         message: 'No Record found!',
@@ -287,11 +192,53 @@ const deleteDataById = (req, res) => {
   });
 };
 
+const deleteDocs = (req, res) => {
+  const userId = req.auth._id;
+  const docs = req.body.docs;
+
+  if (docs?.length) {
+    model.findOne({ userId }).exec((err, data) => {
+      if (err) {
+        logger.error(err);
+      }
+      if (data) {
+        docs.forEach((key) => {
+          model
+            .updateOne(
+              { userId },
+              {
+                $set: {
+                  [key]: {
+                    name: null,
+                    data: null,
+                    contentType: null,
+                  },
+                },
+              }
+            )
+            .then(() => null);
+        });
+        res.status(200).json({
+          message: `${docs.length} document deleted succesfully!`,
+        });
+      } else {
+        res.json({
+          message: 'No Record found!',
+        });
+      }
+    });
+  } else {
+    res.json({
+      error: 'Give atleast 1 doc in an array with docs as a key!',
+    });
+  }
+};
+
 module.exports = {
   uploadData,
   updateData,
   getData,
-  getDataById,
-  getAllData,
+  getPhoto,
   deleteDataById,
+  deleteDocs,
 };

@@ -49,6 +49,104 @@ var schema = new mongoose.Schema(
         default: null
       },
     },
+    doc4: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
+    doc5: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
+    doc6: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
+    doc7: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
+    doc8: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
+    doc9: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
+    doc10: {
+      name:  {
+        type: String,
+        default: null
+      },
+      data: {
+        type: Buffer,
+        default: null
+      },
+      contentType: {
+        type: String,
+        default: null
+      },
+    },
   },
   { timestamps: true }
 );
