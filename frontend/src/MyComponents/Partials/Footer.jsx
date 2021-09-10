@@ -3,6 +3,7 @@ import Logo from './../../argus website/SVG/logosvg.svg';
 import { Link } from 'react-router-dom';
 import { subscriber } from '../../helpers/footer';
 import { getContact } from '../../helpers/contact';
+import CompannyContact from '../Components/CompanyContact';
 
 
 const Footer = () => {
@@ -53,20 +54,7 @@ const Footer = () => {
                 residential sector in Ontario.
               </p>
               <hr className='border-1 border-gray-600 w-11/12 my-3' />
-              <p href='tel:6472891070' className='px-2 py-1'>
-                {/* <img src={phone_logo} alt="Phone Logo" /> */}
-                <p>{contact?.phoneNumber}</p>
-              </p>
-              <p
-                href='mailto:info@argussecurityservices.ca'
-                className='px-2 py-1'>
-                {/* <img src={phone_logo} alt="Phone Logo" /> */}
-                <p>{contact?.email}</p>
-              </p>
-              {/* <img src={phone_logo} alt="Phone Logo" /> */}
-              <p>
-                {contact?.address}
-              </p>
+              <CompannyContact />
             </div>
             <div className='lg:w-1/3 md:w-1/2 w-full px-4 pt-10 md:pt-32'>
               <h2 className='title-font font-bold text-white tracking-widest text-2xl md:text-sm mb-5'>

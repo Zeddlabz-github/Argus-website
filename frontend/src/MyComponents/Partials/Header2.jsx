@@ -8,7 +8,7 @@ class Header2 extends Component {
   render() {
     return (
 
-      <div className="hidden lg:block px-4 sm:px-8 md:px-16 lg:px-28 xl:px-48 text-sm -mb-12 font-for-para">
+      <div className="hidden lg:block px-4 sm:px-8 md:px-16 lg:px-28 xl:px-48 text-sm -mb-12 font-for-para z-10 sticky">
         <nav class="flex flex-wrap items-center text-base">
           <Link to="/about" className="w-1/5 text-white py-3 text-center bg-gray-2 bg-opacity-60 hover:bg-red-1 hover:bg-opacity-60">
             ABOUT

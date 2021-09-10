@@ -4,22 +4,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import section4_img1 from "./../../argus website/PNG/Video1.png";
 import section4_img2 from "./../../argus website/PNG/3.Charlie.png";
-import quotes from "./../../argus website/PNG/qoutes.PNG";
+import quotes from "../../argus website/PNG/quotes.PNG";
 import signature from "./../../argus website/SVG/01.svg";
 import section6 from "./../../argus website/PNG/sdm.png";
 import section4img from "./../../argus website/PNG/raw-2_edited.png";
 import section5 from "./../../argus website/PNG/0000000.png";
 import image1 from "./../../argus website/PNG/raw-2_edited.png";
-import empofmonth from "./../../argus website/PNG/8. Sud.png";
 import testimonial from "./../../argus website/PNG/IMG_0118.png";
 import sponsor1 from "./../../argus website/PNG/6. Sponsor 1.png";
 import sponsor2 from "./../../argus website/PNG/7. Sponsor 2.png";
 import camera from "./../../argus website/SVG/3. camera.svg";
-import medal from "./../../argus website/SVG/3. Medal.svg";
+import HeroImage from "./../../argus website/PNG/2.png";
 import Header from "./../Partials/Header";
 import Header2 from "./../Partials/Header2";
 import Stickynav from "./../Partials/Stickynav";
 import MobileHeader from "../Partials/MobileHeader";
+import EmployeeMonth from "../Components/EmployeeMonth";
 
 export default function Home() {
   return (
@@ -30,12 +30,16 @@ export default function Home() {
       <MobileHeader />
 
       {/* Section 1 */}
-      <div className="bg-cover bg-center bg-no-repeat bg-hero">
-        <p className="py-24 sm:py-72"></p>
+      <div className="bg-cover bg-center bg-no-repeat bg-empofmon bg-fixed">
+        <img
+          src={HeroImage}
+          alt=""
+          className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48"
+        />
       </div>
 
       {/* Section 2 CAll Us */}
-      <div className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 mx-auto sm:-mt-36 z-0">
+      <div className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end mx-auto">
           <h1 className="flex-grow sm:pr-16 text-4xl font-bold font-for-para text-gray-400">
             Call Us <br />
@@ -55,7 +59,7 @@ export default function Home() {
           <div className="bg-red-1 w-full sm:w-6/12 px-3 py-5 flex flex-row items-center justify-center">
             <FontAwesomeIcon
               icon="search"
-              className="w-12 h-12 text-white p-1 mr-10"
+              className="text-4xl text-white p-1 mr-10"
             />
             <div>
               <p>100% Accountable</p>
@@ -63,13 +67,11 @@ export default function Home() {
             </div>
           </div>
           <div className="bg-gray-3 w-full sm:w-6/12 px-3 py-5 flex flex-row items-center justify-center">
-            <div className="w-2/12 ">
             <FontAwesomeIcon
               icon="search"
-              className="w-16 h-16 text-white"
+              className="text-4xl text-white p-1 mr-10"
             />
-            </div>
-            <div className="w-10/12">
+            <div>
               <p>100% Accountable</p>
               <h1 className="font-bold">Direct Updates Regarding Incidents</h1>
             </div>
@@ -90,7 +92,7 @@ export default function Home() {
               <img
                 src={section4_img2}
                 alt="Argus Security Services"
-                className="bg-white w-8/12 pt-4 pl-4 -mt-36 md:-md-40 lg:-mt-48 xl:-mt-72"
+                className="bg-white w-8/12 pt-4 pl-4 -mt-36 md:-md-40 lg:-mt-52 xl:-mt-80"
               />
             </div>
             <div className="md:pl-3 w-full md:w-1/2 flex flex-col items-start">
@@ -140,7 +142,7 @@ export default function Home() {
                     <img
                       src={quotes}
                       alt=""
-                      className="w-12 inline-block text-red-1 ml-4 mb-2"
+                      className="w-12 inline-block text-red-1 ml-4 -mb-4"
                     />
                     <p className="leading-relaxed text-xl font-medium text-gray-2 bg-gray-200 px-12 py-8 shadow-lg mb-8">
                       Success is not result of the amount of time we put in,
@@ -169,7 +171,7 @@ export default function Home() {
       </div>
 
       {/* Section 5 Services */}
-      <div className="bg-gray-200 px-4 sm:px-8 md:px-20 lg:px-32 xl:px-48 pt-24 pb-12 font-for-para">
+      <div className="bg-no-repeat bg-contain bg-siren px-4 sm:px-8 md:px-20 lg:px-32 xl:px-48 pt-24 pb-12 font-for-para">
         <div className="flex flex-wrap">
           <div className="flex flex-wrap w-full items-baseline">
             <div className="w-full flex flex-col md:flex-row items-center pb-5">
@@ -187,78 +189,81 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-between text-center mb-8 ">
-          <div className="p-8 md:w-1/3">
+        <div className="flex flex-wrap justify-between text-center mb-16 ">
+          
+          
+          <div className="p-4 md:w-1/3">
             <div className="h-full overflow-hidden ">
               <img
-                className="lg:h-48 md:h-36 w-full object-cover object-center"
+                className="lg:h-64 md:h-36 w-full object-cover object-center transform hover:scale-110 duration-300"
                 src={image1}
                 alt="blog"
               />
-              <div className=" bg-white">
-                <h1 className="title-font text-lg font-medium text-white p-4 mb-3 bg-center bg-no-repeat bg-shape1">
+              <div className="bg-white border-6 hover:bg-gray-200 duration-500">
+                <h1 className="title-font text-lg font-medium text-white p-3 mb-3 bg-center bg-no-repeat bg-shape1">
                   GATED COMMUNITY
                 </h1>
                 <p className="leading-loose text-gray-2 px-6 py-2">
                   NFS marked vehicles, communication between residents &
                   security staff and efficient use of technology
                 </p>
-              </div>
-              <Link to="/contact">
-                <button className="w-full p-4 rounded-lg border text-white bg-red-1 hover:bg-white hover:text-red-1 hover:border-red-1">
+                <Link to="/contact">
+                <button className="w-full p-4 text-black bg-gray-200 hover:bg-red-1 hover:text-white">
                   Read More
                 </button>
               </Link>
+              </div>
             </div>
           </div>
 
-          <div className="p-8 md:w-1/3">
+          <div className="p-4 md:w-1/3">
             <div className="h-full overflow-hidden ">
               <img
-                className="lg:h-48 md:h-36 w-full object-cover object-center"
+                className="lg:h-64 md:h-36 w-full object-cover object-center transform hover:scale-110 duration-300"
                 src={image1}
                 alt="blog"
               />
-              <div className=" bg-white">
-                <h1 className="title-font text-lg font-medium text-white p-4 mb-3 bg-center bg-no-repeat bg-shape1">
+              <div className=" bg-white border-6 hover:bg-gray-200 duration-500">
+                <h1 className="title-font text-lg font-medium text-white p-3 mb-3 bg-center bg-no-repeat bg-shape1">
                   GATED COMMUNITY
                 </h1>
                 <p className="leading-loose text-gray-2 px-6 py-2">
                   NFS marked vehicles, communication between residents &
                   security staff and efficient use of technology
                 </p>
-              </div>
-              <Link to="/contact">
-                <button className="w-full p-4 rounded-lg border text-white bg-red-1 hover:bg-white hover:text-red-1 hover:border-red-1">
+                <Link to="/contact">
+                <button className="w-full p-4 text-black bg-gray-200 hover:bg-red-1 hover:text-white">
                   Read More
                 </button>
               </Link>
+              </div>
             </div>
           </div>
 
-          <div className="p-8 md:w-1/3">
+          <div className="p-4 md:w-1/3">
             <div className="h-full overflow-hidden ">
               <img
-                className="lg:h-48 md:h-36 w-full object-cover object-center"
+                className="lg:h-64 md:h-36 w-full object-cover object-center transform hover:scale-110 duration-300"
                 src={image1}
                 alt="blog"
               />
-              <div className=" bg-white">
-                <h1 className="title-font text-lg font-medium text-white p-4 mb-3 bg-center bg-no-repeat bg-shape1">
+              <div className=" bg-white border-6 hover:bg-gray-200 duration-500">
+                <h1 className="title-font text-lg font-medium text-white p-3 mb-3 bg-center bg-no-repeat bg-shape1">
                   GATED COMMUNITY
                 </h1>
                 <p className="leading-loose text-gray-2 px-6 py-2">
                   NFS marked vehicles, communication between residents &
                   security staff and efficient use of technology
                 </p>
-              </div>
-              <Link to="/contact">
-                <button className="w-full p-4 rounded-lg border text-white bg-red-1 hover:bg-white hover:text-red-1 hover:border-red-1">
+                <Link to="/contact">
+                <button className="w-full p-4 text-black bg-gray-200 hover:bg-red-1 hover:text-white">
                   Read More
                 </button>
               </Link>
+              </div>
             </div>
           </div>
+
         </div>
         <div className="w-9/12 mx-auto flex items-center py-3">
           <img src={section5} className="w-24 h-24" alt="" />
@@ -395,13 +400,16 @@ export default function Home() {
           </h1>
         </div>
         <div className="flex flex-wrap mb-16">
-          <div className="p-4 md:w-1/2 w-full">
-            <div className="h-full bg-white p-8 shadow-lg">
-              <img
-                src={quotes}
-                alt=""
-                className="w-12 inline-block text-red-1 mb-4"
-              />
+          <div className="p-8 md:w-1/2 w-full">
+            <div className="h-full bg-white shadow-lg flex flex-col">
+              <div className="bg-gray-1 px-6 py-10 ml-auto">
+                <img
+                  src={quotes}
+                  alt=""
+                  className="w-12 text-red-1 ml-auto -mt-16"
+                />
+              </div>
+              <div className ="px-6 sm:px-16 pb-10 pt-4">
               <p className="leading-loose mb-6">
                 Argus helped me find my child in a crowded mall. I would be
                 eternally thankful.
@@ -419,15 +427,19 @@ export default function Home() {
                   <span className="text-black text-sm">The Sidhu Estates</span>
                 </span>
               </div>
+              </div>
             </div>
           </div>
-          <div className="p-4 md:w-1/2 w-full">
-            <div className="h-full bg-white p-8 shadow-lg">
-              <img
-                src={quotes}
-                alt=""
-                className="w-12 inline-block text-red-1 mb-4"
-              />
+          <div className="p-8 md:w-1/2 w-full">
+            <div className="h-full bg-white shadow-lg flex flex-col">
+              <div className="bg-gray-1 px-6 py-10 ml-auto">
+                <img
+                  src={quotes}
+                  alt=""
+                  className="w-12 text-red-1 ml-auto -mt-16"
+                />
+              </div>
+              <div className ="px-6 sm:px-16 pb-10 pt-4">
               <p className="leading-loose mb-6">
                 Argus helped me find my child in a crowded mall. I would be
                 eternally thankful.
@@ -444,6 +456,7 @@ export default function Home() {
                   </span>
                   <span className="text-black text-sm">The Sidhu Estates</span>
                 </span>
+              </div>
               </div>
             </div>
           </div>
@@ -451,72 +464,7 @@ export default function Home() {
       </div>
 
       {/* Section 9 Employee of the Month */}
-      <div>
-        <img src={medal} alt="" className="w-52 h-52 mr-auto -mb-52" />
-        <div className="px-4 sm:px-8 md:px-20 lg:px-32 xl:px-48 py-16 bg-cover bg-no-repeat bg-empofmon font-for-para">
-          <div className="flex flex-wrap items-center">
-            <div className="md:px-12 w-full md:w-1/2 flex flex-col items-start">
-              <div className="flex flex-col md:flex-row items-center w-full mb-4">
-                <span className="h-1 w-10 bg-red-1 m-6 md:m-0 md:mr-4"></span>
-                <h1 className="leading-tight text-4xl font-bold text-gray-3 mb-4">
-                  Employee of the <br />
-                  Month
-                </h1>
-              </div>
-              <p className="leading-loose text-l text-gray-2 mb-8">
-                <span className="text-red-1">Ramanjeet Singh Sran </span>
-                embodies the core values of Argus and has repeatedly gone above
-                and beyond the call of duty to provide reliable customer
-                service.
-              </p>
-              <ul className="text-gray-3 font-bold text-l">
-                <li className="py-1">
-                  <span className="text-red-1">✓</span> Driven
-                </li>
-                <li className="py-1">
-                  <span className="text-red-1">✓</span> Hard Working
-                </li>
-                <li className="py-1">
-                  <span className="text-red-1">✓</span> Reliable
-                </li>
-              </ul>
-              <div>
-                <div className="px-2 py-2 mx-auto">
-                  <div className="w-full text-left">
-                    <img
-                      src={quotes}
-                      alt=""
-                      className="w-12 inline-block text-red-1 ml-4 mb-2"
-                    />
-                    <p className="leading-normal text-xl font-medium text-gray-2 bg-gray-200 px-12 py-6 shadow-lg mb-8">
-                      Success is not result of the amount of time we put in,
-                      instead its the quality of time we put in.
-                    </p>
-                    <div className="pt-6 flex items-center ">
-                      <img
-                        src={section4img}
-                        className="w-20 h-20 p-1 border-2 border-red-1"
-                        alt=""
-                      />
-                      <div className="ml-8">
-                        <img src={signature} alt="" className="w-60" />
-                        <p className="text-gray-3 font-bold">AREA MANAGER</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="items-end w-full md:w-1/2 lg:pl-12">
-              <img
-                src={empofmonth}
-                alt="Argus Security Services"
-                className="w-10/12"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <EmployeeMonth />
 
       {/* Section 10 Sponsors */}
       <div className="px-4 sm:px-8 md:px-16 lg:px-28 xl:px-48 py-12 mx-auto bg-gray-1">

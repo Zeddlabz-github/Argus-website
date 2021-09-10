@@ -29,8 +29,6 @@ const EmpOfMon = () => {
 	} = values;
 
 
-  
-  
   return (
         <div className="mx-8 my-8 p-4 bg-white shadow-lg rounded-xl">
 
