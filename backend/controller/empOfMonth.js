@@ -163,6 +163,9 @@ const getAllData = (req, res) => {
       logger.error(err);
     }
     if (data) {
+      data.empImage = undefined;
+      data.instructorImage = undefined;
+      data.instructorSign = undefined;
       res.send(data);
     } else {
       res.json({
