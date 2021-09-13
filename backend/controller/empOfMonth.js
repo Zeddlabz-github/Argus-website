@@ -89,23 +89,21 @@ const saveData = (req, res) => {
 };
 
 const getData = (req, res) => {
-  model
-    .findOne({month})
-    .exec((err, data) => {
-      if (err) {
-        logger.error(err);
-      }
-      if (data) {
-        data.empImage = undefined;
-        data.instructorImage = undefined;
-        data.instructorSign = undefined;
-        res.send(data);
-      } else {
-        res.json({
-          message: 'No Record found!',
-        });
-      }
-    });
+  model.findOne({ month }).exec((err, data) => {
+    if (err) {
+      logger.error(err);
+    }
+    if (data) {
+      data.empImage = undefined;
+      data.instructorImage = undefined;
+      data.instructorSign = undefined;
+      res.send(data);
+    } else {
+      res.json({
+        message: 'No Record found!',
+      });
+    }
+  });
 };
 
 const getDataById = (req, res) => {
@@ -163,9 +161,11 @@ const getAllData = (req, res) => {
       logger.error(err);
     }
     if (data) {
-      data.empImage = undefined;
-      data.instructorImage = undefined;
-      data.instructorSign = undefined;
+      data?.forEach((data) => {
+        data.empImage = undefined;
+        data.instructorImage = undefined;
+        data.instructorSign = undefined;
+      });
       res.send(data);
     } else {
       res.json({
