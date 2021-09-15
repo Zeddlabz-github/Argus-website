@@ -44,6 +44,7 @@ const saveData = (req, res) => {
           error: 'Saving data in DB failed',
         });
       }
+      data.photo = undefined;
       res.json(data);
     });
   });
@@ -118,17 +119,17 @@ const updateDataById = (req, res) => {
       !isApproved ? (isApproved = data.isApproved) : isApproved;
       !priority ? (priority = data.priority) : priority;
 
-      let data, type;
+      let empData, type;
       if (file.photo) {
         if (file.photo.size > 3000000) {
           return res.status(400).json({
             error: 'File size too big!',
           });
         }
-        data = fs.readFileSync(file.photo.path);
+        empData = fs.readFileSync(file.photo.path);
         type = file.photo.type;
       } else {
-        data = data.photo.data;
+        empData = data.photo.data;
         type = data.photo.contentType;
       }
 
@@ -141,7 +142,7 @@ const updateDataById = (req, res) => {
               role: role,
               description: description,
               photo: {
-                data: data,
+                data: empData,
                 contentType: type,
               },
               isApproved: isApproved,
