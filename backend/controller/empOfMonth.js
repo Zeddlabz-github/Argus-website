@@ -112,6 +112,9 @@ const getDataById = (req, res) => {
       logger.error(err);
     }
     if (data) {
+      data.empImage = undefined;
+      data.instructorImage = undefined;
+      data.instructorSign = undefined;
       res.send(data);
     } else {
       res.json({
@@ -146,6 +149,9 @@ const getDataByMonth = (req, res) => {
       logger.error(err);
     }
     if (data) {
+      data.empImage = undefined;
+      data.instructorImage = undefined;
+      data.instructorSign = undefined;
       res.send(data);
     } else {
       res.json({
@@ -182,116 +188,124 @@ const updateDataById = (req, res) => {
     if (err) {
       logger.error(err);
     }
-    form.parse(req, (err, fields, file) => {
-      if (err) {
-        return res.status(400).json({
-          error: 'problem with image',
-        });
-      }
-      let {
-        empName,
-        empDesc,
-        skills,
-        description,
-        instructorName,
-        instructorRole,
-        month,
-        year,
-      } = fields;
-
-      !empName ? (empName = data.empName) : empName;
-      !empDesc ? (empDesc = data.empDesc) : empDesc;
-      !skills ? (skills = data.skills) : skills.split(',');
-      !description ? (description = data.description) : description;
-      !instructorName ? (instructorName = data.instructorName) : instructorName;
-      !instructorRole ? (instructorRole = data.instructorRole) : instructorRole;
-      !month ? (month = data.month) : month;
-      !year ? (year = data.year) : year;
-
-      let empData,
-        empType,
-        instructorData,
-        instructorType,
-        instructorSignData,
-        instructorSignType;
-      if (file.empImage) {
-        if (file.empImage.size > 3000000) {
-          return res.status(400).json({
-            error: 'File size too big!',
-          });
-        }
-        empData = fs.readFileSync(file.empImage.path);
-        empType = file.empImage.type;
-      } else {
-        empData = data.empImage.data;
-        empType = data.empImage.contentType;
-      }
-
-      if (file.instructorImage) {
-        if (file.instructorImage.size > 3000000) {
-          return res.status(400).json({
-            error: 'File size too big!',
-          });
-        }
-        instructorData = fs.readFileSync(file.instructorImage.path);
-        instructorType = file.instructorImage.type;
-      } else {
-        instructorData = data.instructorImage.data;
-        instructorType = data.instructorImage.contentType;
-      }
-
-      if (file.instructorSign) {
-        if (file.instructorSign.size > 3000000) {
-          return res.status(400).json({
-            error: 'File size too big!',
-          });
-        }
-        instructorSignData = fs.readFileSync(file.instructorSign.path);
-        instructorSignType = file.instructorSign.type;
-      } else {
-        instructorSignData = data.instructorSign.data;
-        instructorSignType = data.instructorSign.contentType;
-      }
-
-      model
-        .updateOne(
-          { _id: req.params.id },
-          {
-            $set: {
-              empName: empName,
-              empDesc: empDesc,
-              skills: skills,
-              description: description,
-              instructorName: instructorName,
-              instructorRole: instructorRole,
-              month: month,
-              year: year,
-              empImage: {
-                data: empData,
-                contentType: empType,
-              },
-              instructorImage: {
-                data: instructorData,
-                contentType: instructorType,
-              },
-              instructorSign: {
-                data: instructorSignData,
-                contentType: instructorSignType,
-              },
-            },
-          }
-        )
-        .then(() => {
-          res.json({
-            message: 'User Updated Successfully!',
-          });
+    if (!data) {  
+        res.status(404).json({
+          'message': "No Record to update!"
         })
-        .catch(() => {
-          res.json({
-            error: 'User Updation Failed!',
+    } else {
+      form.parse(req, (err, fields, file) => {
+        if (err) {
+          return res.status(400).json({
+            error: 'problem with image',
           });
-        });
-    });
+        }
+        let {
+          empName,
+          empDesc,
+          skills,
+          description,
+          instructorName,
+          instructorRole,
+          month,
+          year,
+        } = fields;
+  
+  
+        !empName ? (empName = data?.empName) : empName;
+        !empDesc ? (empDesc = data?.empDesc) : empDesc;
+        !skills ? (skills = data?.skills) : skills.split(',');
+        !description ? (description = data?.description) : description;
+        !instructorName ? (instructorName = data?.instructorName) : instructorName;
+        !instructorRole ? (instructorRole = data?.instructorRole) : instructorRole;
+        !month ? (month = data?.month) : month;
+        !year ? (year = data?.year) : year;
+  
+        let empData,
+          empType,
+          instructorData,
+          instructorType,
+          instructorSignData,
+          instructorSignType;
+        if (file.empImage) {
+          if (file.empImage.size > 3000000) {
+            return res.status(400).json({
+              error: 'File size too big!',
+            });
+          }
+          empData = fs.readFileSync(file.empImage.path);
+          empType = file.empImage.type;
+        } else {
+          empData = data.empImage.data;
+          empType = data.empImage.contentType;
+        }
+  
+        if (file.instructorImage) {
+          if (file.instructorImage.size > 3000000) {
+            return res.status(400).json({
+              error: 'File size too big!',
+            });
+          }
+          instructorData = fs.readFileSync(file.instructorImage.path);
+          instructorType = file.instructorImage.type;
+        } else {
+          instructorData = data.instructorImage.data;
+          instructorType = data.instructorImage.contentType;
+        }
+  
+        if (file.instructorSign) {
+          if (file.instructorSign.size > 3000000) {
+            return res.status(400).json({
+              error: 'File size too big!',
+            });
+          }
+          instructorSignData = fs.readFileSync(file.instructorSign.path);
+          instructorSignType = file.instructorSign.type;
+        } else {
+          instructorSignData = data.instructorSign.data;
+          instructorSignType = data.instructorSign.contentType;
+        }
+  
+        model
+          .updateOne(
+            { _id: req.params.id },
+            {
+              $set: {
+                empName: empName,
+                empDesc: empDesc,
+                skills: skills,
+                description: description,
+                instructorName: instructorName,
+                instructorRole: instructorRole,
+                month: month,
+                year: year,
+                empImage: {
+                  data: empData,
+                  contentType: empType,
+                },
+                instructorImage: {
+                  data: instructorData,
+                  contentType: instructorType,
+                },
+                instructorSign: {
+                  data: instructorSignData,
+                  contentType: instructorSignType,
+                },
+              },
+            }
+          )
+          .then(() => {
+            res.json({
+              message: 'User Updated Successfully!',
+            });
+          })
+          .catch(() => {
+            res.json({
+              error: 'User Updation Failed!',
+            });
+          });
+      });
+    }
+    
   });
 };
 

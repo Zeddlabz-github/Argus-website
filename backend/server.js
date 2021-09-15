@@ -27,6 +27,7 @@ const contact = require("./route/contact");
 const subscription = require("./route/subscription");
 const docs = require("./route/docs");
 const contactUser = require("./route/contactUser")
+const client = require("./route/client");
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -42,6 +43,7 @@ app.use("/api", contact);
 app.use("/api", subscription);
 app.use("/api", docs);
 app.use("/api", contactUser);
+app.use("/api", client);
 
 const PORT = 8000;
 

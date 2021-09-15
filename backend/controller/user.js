@@ -21,7 +21,7 @@ const getUser = (req, res) => {
 
 //This code is used to get all the users information TODO: Later delete this code
 const getAllUsers = (req, res) => {
-  User.find().exec((err, user) => {
+  User.find({}).exec((err, user) => {
     if (err || !user) {
       return res.status(400).json({
         error: 'No users were found in a DB!',

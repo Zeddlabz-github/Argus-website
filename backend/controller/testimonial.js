@@ -56,6 +56,7 @@ const getDataById = (req, res) => {
       logger.error(err);
     }
     if (data) {
+      data.photo = undefined;
       res.send(data);
     } else {
       res.json({

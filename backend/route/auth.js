@@ -2,49 +2,54 @@
  * @author krish
  */
 
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { check } = require("express-validator");
+const { check } = require('express-validator');
 const {
   signup,
   signin,
   update,
   signout,
   isSignedIn,
-} = require("../controller/auth");
+  isValidToken,
+  isAdmin,
+} = require('../controller/auth');
 
 router.post(
-  "/signup",
+  '/signup',
   [
-    check("email").isEmail().withMessage("Please Provide a valid E-Mail !"),
-    check("password")
+    check('email').isEmail().withMessage('Please Provide a valid E-Mail !'),
+    check('password')
       .isLength({ min: 6 })
-      .withMessage("Password length should be minimum of 8 characters"),
+      .withMessage('Password length should be minimum of 8 characters'),
   ],
   signup
 );
 
 router.post(
-  "/signin",
+  '/signin',
   [
-    check("email").isEmail().withMessage("Please Provide a valid E-Mail !"),
-    check("password")
+    check('email').isEmail().withMessage('Please Provide a valid E-Mail !'),
+    check('password')
       .isLength({ min: 1 })
-      .withMessage("Password field is required"),
+      .withMessage('Password field is required'),
   ],
   signin
 );
 
 router.put(
-  "/user/update",
-  [check("id").isUUID().withMessage("Please Provide id")],
+  '/user/update',
+  [check('id').isUUID().withMessage('Please Provide id')],
+  isSignedIn,
+  isValidToken,
+  isAdmin,
   update
 );
 
-router.get("/signout", signout);
+router.get('/signout', signout);
 
 //just for test TODO: LATER DELETE IT
-router.get("/testroute", isSignedIn, (req, res) => {
+router.get('/testroute', isSignedIn, (req, res) => {
   res.json(req.auth);
 });
 

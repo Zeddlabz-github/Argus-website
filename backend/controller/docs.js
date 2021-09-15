@@ -164,7 +164,7 @@ const getDoc = (req, res) => {
         res.send(data[`${doc}`].data);
       } else {
         res.status(404).json({
-          message: 'Photo Not Found!',
+          message: 'Doc Not Found!',
         });
       }
     } else {

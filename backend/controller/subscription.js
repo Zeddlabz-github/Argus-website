@@ -91,7 +91,12 @@ const updateDataById = (req, res) => {
     if (err) {
       logger.error(err);
     }
-    let { email, isApproved } = req.body;
+    if(!data) {
+      res.status(404).json(({
+        'error' : 'No record found!'
+      }))
+    } else {
+      let { email, isApproved } = req.body;
     if (data.email === email) {
       return res.json({
         error: 'Please enter different E-Mail address to update',
@@ -121,6 +126,7 @@ const updateDataById = (req, res) => {
           error: 'User Updation Failed!',
         });
       });
+    }
   });
 };
 
