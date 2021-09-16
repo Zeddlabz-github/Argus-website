@@ -11,22 +11,22 @@ const {
   updateDataById,
   deleteDataById,
   getPhoto,
-} = require("../controller/client");
+} = require("../controller/team");
 const { isSignedIn, isValidToken, isAdmin } = require("../controller/auth");
 
-router.post("/client/create", isSignedIn, isValidToken, isAdmin, saveData);
-router.get("/client/get/:id", getDataById);
-router.get("/client/get-all", getAllData);
+router.post("/team/create", isSignedIn, isValidToken, isAdmin, saveData);
+router.get("/team/get/:id", getDataById);
+router.get("/team/get-all", getAllData);
 router.put(
-  "/client/update/:id",
+  "/team/update/:id",
   isSignedIn,
   isValidToken,
   isAdmin,
   updateDataById
 );
-router.get("/client/get-photo/:id", getPhoto);
+router.get("/team/get-photo/:id", getPhoto);
 router.delete(
-  "/client/delete/:id",
+  "/team/delete/:id",
   isSignedIn,
   isValidToken,
   isAdmin,

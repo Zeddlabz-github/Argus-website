@@ -26,8 +26,9 @@ const testimonial = require("./route/testimonial");
 const contact = require("./route/contact");
 const subscription = require("./route/subscription");
 const docs = require("./route/docs");
-const contactUser = require("./route/contactUser")
+const contactUser = require("./route/contactUser");
 const client = require("./route/client");
+const team = require("./route/team");
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -44,6 +45,7 @@ app.use("/api", subscription);
 app.use("/api", docs);
 app.use("/api", contactUser);
 app.use("/api", client);
+app.use("/api", team);
 
 const PORT = 8000;
 

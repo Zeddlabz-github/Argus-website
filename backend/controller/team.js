@@ -2,7 +2,7 @@
  * @author krish
  */
 
-const model = require("../model/testimonial");
+const model = require("../model/team");
 const formidable = require("formidable");
 const fs = require("fs");
 
@@ -21,13 +21,23 @@ const saveData = (req, res) => {
     }
     let { name, role, description } = fields;
 
-    if (!name || !role || !description) {
+    if (!name) {
       return res.status(400).json({
-        error: "Please include all fields",
+        error: "Please include name!",
+      });
+    }
+    if (!role) {
+      return res.status(400).json({
+        error: "Please include role!",
+      });
+    }
+    if (!description) {
+      return res.status(400).json({
+        error: "Please include description!",
       });
     }
 
-    let testimonialModel = new model(fields);
+    let teamModel = new model(fields);
 
     if (file.photo) {
       if (file.photo.size > 3000000) {
@@ -35,10 +45,10 @@ const saveData = (req, res) => {
           error: "File size too big!",
         });
       }
-      testimonialModel.photo.data = fs.readFileSync(file.photo.path);
-      testimonialModel.photo.contentType = file.photo.type;
+      teamModel.photo.data = fs.readFileSync(file.photo.path);
+      teamModel.photo.contentType = file.photo.type;
     }
-    testimonialModel.save((err, data) => {
+    teamModel.save((err, data) => {
       if (err) {
         res.status(400).json({
           error: "Saving data in DB failed",
@@ -112,25 +122,23 @@ const updateDataById = (req, res) => {
           error: "problem with image",
         });
       }
-      let { name, role, description, isApproved, priority } = fields;
+      let { name, role, description } = fields;
 
       !name ? (name = data.name) : name;
       !role ? (role = data.role) : role;
       !description ? (description = data.description) : description;
-      !isApproved ? (isApproved = data.isApproved) : isApproved;
-      !priority ? (priority = data.priority) : priority;
 
-      let empData, type;
+      let teamData, type;
       if (file.photo) {
         if (file.photo.size > 3000000) {
           return res.status(400).json({
             error: "File size too big!",
           });
         }
-        empData = fs.readFileSync(file.photo.path);
+        teamData = fs.readFileSync(file.photo.path);
         type = file.photo.type;
       } else {
-        empData = data.photo.data;
+        teamData = data.photo.data;
         type = data.photo.contentType;
       }
 
@@ -143,11 +151,9 @@ const updateDataById = (req, res) => {
               role: role,
               description: description,
               photo: {
-                data: empData,
+                data: teamData,
                 contentType: type,
               },
-              isApproved: isApproved,
-              priority: priority,
             },
           }
         )
