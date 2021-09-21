@@ -44,19 +44,7 @@ const saveData = (req, res) => {
           title,
         } = fields;
 
-        if (
-          !empName ||
-          !empDesc ||
-          !skills ||
-          !description ||
-          !instructorName ||
-          !instructorRole ||
-          !title
-        ) {
-          return res.status(400).json({
-            error: 'Please include all fields',
-          });
-        }
+        
         skills = skills.split(',');
 
         let empModel = new model(fields);
