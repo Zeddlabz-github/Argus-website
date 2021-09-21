@@ -16,6 +16,7 @@ let schema = new mongoose.Schema(
       data: Buffer,
       contentType: String,
     },
+    url: String,
   },
   { timestamps: true }
 );

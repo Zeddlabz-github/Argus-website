@@ -12,6 +12,7 @@ let schema = new mongoose.Schema(
     description: String,
     instructorName: String,
     instructorRole: String,
+    title: String,
     empImage: {
       name:  {
         type: String,

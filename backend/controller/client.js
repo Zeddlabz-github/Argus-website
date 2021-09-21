@@ -2,13 +2,13 @@
  * @author krish
  */
 
-const model = require("../model/client");
-const formidable = require("formidable");
-const fs = require("fs");
+const model = require('../model/client');
+const formidable = require('formidable');
+const fs = require('fs');
 
-let log4js = require("log4js");
+let log4js = require('log4js');
 let logger = log4js.getLogger();
-logger.level = "debug";
+logger.level = 'debug';
 
 const saveData = (req, res) => {
   let form = new formidable.IncomingForm();
@@ -16,14 +16,14 @@ const saveData = (req, res) => {
   form.parse(req, (err, fields, file) => {
     if (err) {
       return res.status(400).json({
-        error: "problem with image",
+        error: 'problem with image',
       });
     }
-    let { name } = fields;
+    let { name, url } = fields;
 
     if (!name) {
       return res.status(400).json({
-        error: "Please include name!",
+        error: 'Please include name!',
       });
     }
 
@@ -32,7 +32,7 @@ const saveData = (req, res) => {
     if (file.logo) {
       if (file.logo.size > 3000000) {
         return res.status(400).json({
-          error: "File size too big!",
+          error: 'File size too big!',
         });
       }
       clientModel.logo.data = fs.readFileSync(file.logo.path);
@@ -41,7 +41,7 @@ const saveData = (req, res) => {
     clientModel.save((err, data) => {
       if (err) {
         res.status(400).json({
-          error: "Saving data in DB failed",
+          error: 'Saving data in DB failed',
         });
       }
       data.logo = undefined;
@@ -60,7 +60,7 @@ const getDataById = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -76,7 +76,7 @@ const getAllData = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -89,11 +89,11 @@ const getPhoto = (req, res) => {
       logger.error(err);
     }
     if (data) {
-      res.set("Content-Type", data.logo.contentType);
+      res.set('Content-Type', data.logo.contentType);
       return res.send(data.logo.data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
@@ -109,18 +109,19 @@ const updateDataById = (req, res) => {
     form.parse(req, (err, fields, file) => {
       if (err) {
         return res.status(400).json({
-          error: "problem with image",
+          error: 'problem with image',
         });
       }
-      let { name } = fields;
+      let { name, url } = fields;
 
       !name ? (name = data.name) : name;
+      !url ? (url = data.url) : url;
 
       let clientData, type;
       if (file.logo) {
         if (file.logo.size > 3000000) {
           return res.status(400).json({
-            error: "File size too big!",
+            error: 'File size too big!',
           });
         }
         clientData = fs.readFileSync(file.logo.path);
@@ -136,6 +137,7 @@ const updateDataById = (req, res) => {
           {
             $set: {
               name: name,
+              url: url,
               logo: {
                 data: clientData,
                 contentType: type,
@@ -145,12 +147,12 @@ const updateDataById = (req, res) => {
         )
         .then(() => {
           res.json({
-            message: "User Updated Successfully!",
+            message: 'User Updated Successfully!',
           });
         })
         .catch(() => {
           res.json({
-            error: "User Updation Failed!",
+            error: 'User Updation Failed!',
           });
         });
     });
@@ -164,11 +166,11 @@ const deleteDataById = (req, res) => {
     }
     if (data) {
       res.json({
-        message: "Document deleted successfully!",
+        message: 'Document deleted successfully!',
       });
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
