@@ -14,45 +14,45 @@ let schema = new mongoose.Schema(
     instructorRole: String,
     title: String,
     empImage: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     instructorImage: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     instructorSign: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     month: {

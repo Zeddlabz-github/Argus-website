@@ -47,7 +47,7 @@ app.use("/api", contactUser);
 app.use("/api", client);
 app.use("/api", team);
 
-const PORT = 8000;
+const PORT = process.env.PORT||8000;
 
 app.listen(PORT, () => {
   logger.info("Listening on port", PORT);
