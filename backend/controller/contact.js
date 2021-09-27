@@ -36,12 +36,12 @@ const updateData = (req, res) => {
     }
     if (data) {
       let id = data._id;
-      let phNo = req.body.phoneNumber,
+      let phoneNumber = req.body.phoneNumber,
         email = req.body.email,
         address = req.body.address;
       mapLocation = req.body.mapLocation;
       if (req.body.phoneNumber === undefined) {
-        phNo = defaultData.phoneNumber;
+        phoneNumber = defaultData.phoneNumber;
       }
       if (req.body.email === undefined) {
         email = defaultData.email;
@@ -69,7 +69,7 @@ const updateData = (req, res) => {
           res.json({
             message: 'Contact Updated Successfully!',
             data: {
-              phoneNumber: phNo,
+              phoneNumber: phoneNumber,
               email: email,
               address: address,
               mapLocation: mapLocation,
