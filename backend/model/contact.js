@@ -8,7 +8,8 @@
    {
      phoneNumber: String,
      address: String,
-     email: String
+     email: String,
+     mapLocation: String
    },
    { timestamps: true }
  );
