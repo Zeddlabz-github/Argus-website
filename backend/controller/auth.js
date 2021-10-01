@@ -4,8 +4,8 @@
 
 const User = require('../model/user.js');
 const { validationResult } = require('express-validator');
-let jwt = require('jsonwebtoken');
-let expressJwt = require('express-jwt');
+const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
 const user = require('../model/user.js');
 
 const signup = async (req, res) => {
@@ -15,10 +15,7 @@ const signup = async (req, res) => {
       error: errors.array()[0].msg,
     });
   }
-
   const { email } = req.body;
-
-  //create
   await User.findOne({ email }, (err, user) => {
     if (err || user) {
       return res.status(400).json({
@@ -44,14 +41,26 @@ const signup = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  let {
-    id,
+  const {
     name,
     lastname,
+    dateOfBirth,
+    gender,
+    weight,
+    height,
+    eyeColor,
+    hairColor,
+    languagesKnown,
     phone,
+    homePhone,
     address,
+    country,
     city,
+    street,
+    streetNumber,
+    suite,
     province,
+    postalCode,
     isElilligibeToWorkInCanada,
     eligibilityType,
     isValidGuardLicence,
@@ -61,121 +70,114 @@ const update = async (req, res) => {
     isEducationInCanada,
     isPriorExperienceInCanada,
     yearsOfExperience,
+    category,
+    companyName,
+    companyAddress,
+    employeeDuration,
+    isActive,
+    reasonForLeaving,
+    hasCriminalRecord,
+    hasVechicle,
+    hasLicenseToDrive,
   } = req.body;
-  if (name === undefined && lastname === undefined && phone === undefined) {
-    res.json({
-      message: 'Enter atleast one updation field',
-    });
-  } else {
-    await user.findOne({ _id: id }).exec((err, data) => {
-      if (err || !data) {
-        return res.status(400).json({
-          error: 'User Not Found!',
+
+  const id = req.auth._id;
+  await user.findOne({ _id: id }).exec((err, data) => {
+    if (err || !data) {
+      return res.status(400).json({
+        error: 'User Not Found!',
+      });
+    }
+
+    const arr = [];
+    arr.push(Object.keys(req.body));
+
+    arr
+      .filter((val) => val !== employeeDuration)
+      .forEach((ele) => {
+        if (ele === undefined && data[`${ele}`] !== null) {
+          ele = data[`${ele}`];
+        }
+      });
+
+    const employeeDt = {
+      from: null,
+      to: null,
+    };
+
+    if (employeeDuration !== undefined) {
+      if (employeeDuration.from !== undefined) {
+        employeeDt.from = employeeDuration.from;
+      }
+      if (employeeDuration.to !== undefined) {
+        employeeDt.to = employeeDuration.to;
+      }
+    } else {
+      if (data.employeeDuration.from !== null) {
+        employeeDt.from = data.employeeDuration.from;
+      }
+      if (data.employeeDuration.to !== null) {
+        employeeDt.to = data.employeeDuration.to;
+      }
+    }
+
+    user
+      .updateOne(
+        { _id: id },
+        {
+          $set: {
+            name,
+            lastname,
+            dateOfBirth,
+            gender,
+            weight,
+            height,
+            eyeColor,
+            hairColor,
+            languagesKnown,
+            phone,
+            homePhone,
+            address,
+            country,
+            city,
+            street,
+            streetNumber,
+            suite,
+            province,
+            postalCode,
+            isElilligibeToWorkInCanada,
+            eligibilityType,
+            isValidGuardLicence,
+            securityGuardLicenseNo,
+            isDrive,
+            levelOfEducation,
+            isEducationInCanada,
+            isPriorExperienceInCanada,
+            yearsOfExperience,
+            category,
+            companyName,
+            companyAddress,
+            employeeDuration: employeeDt,
+            isActive,
+            reasonForLeaving,
+            hasCriminalRecord,
+            hasVechicle,
+            hasLicenseToDrive,
+          },
+        }
+      )
+      .then(() => {
+        res.json({
+          message: 'User Updated Successfully!',
         });
-      }
-      //personal info
-      if (name === undefined && data.name !== null) {
-        name = data.name;
-      }
-      if (lastname === undefined && data.lastname !== null) {
-        lastname = data.lastname;
-      }
-      if (phone === undefined && data.phone !== null) {
-        phone = data.phone;
-      }
-      if (address === undefined && data.address !== null) {
-        address = data.address;
-      }
-      if (city === undefined && data.city !== null) {
-        city = data.city;
-      }
-      if (province === undefined && data.province !== null) {
-        province = data.province;
-      }
-
-      //work status
-      if (
-        isElilligibeToWorkInCanada === undefined &&
-        data.isElilligibeToWorkInCanada !== null
-      ) {
-        isElilligibeToWorkInCanada = data.isElilligibeToWorkInCanada;
-      }
-      if (eligibilityType === undefined && data.eligibilityType !== null) {
-        eligibilityType = data.eligibilityType;
-      }
-      if (
-        isValidGuardLicence === undefined &&
-        data.isValidGuardLicence !== null
-      ) {
-        isValidGuardLicence = data.isValidGuardLicence;
-      }
-      if (
-        securityGuardLicenseNo === undefined &&
-        data.securityGuardLicenseNo !== null
-      ) {
-        securityGuardLicenseNo = data.securityGuardLicenseNo;
-      }
-      if (isDrive === undefined && data.isDrive !== null) {
-        isDrive = data.isDrive;
-      }
-
-      //education
-      if (levelOfEducation === undefined && data.levelOfEducation !== null) {
-        levelOfEducation = data.levelOfEducation;
-      }
-      if (
-        isEducationInCanada === undefined &&
-        data.isEducationInCanada !== null
-      ) {
-        isEducationInCanada = data.isEducationInCanada;
-      }
-
-      //experience
-      if (
-        isPriorExperienceInCanada === undefined &&
-        data.isPriorExperienceInCanada !== null
-      ) {
-        isPriorExperienceInCanada = data.isPriorExperienceInCanada;
-      }
-      if (yearsOfExperience === undefined && data.yearsOfExperience !== null) {
-        yearsOfExperience = data.yearsOfExperience;
-      }
-
-      user
-        .updateOne(
-          { _id: id },
-          {
-            $set: {
-              name: name,
-              lastname: lastname,
-              phone: phone,
-              address: address,
-              city: city,
-              province: province,
-              isElilligibeToWorkInCanada: isElilligibeToWorkInCanada,
-              eligibilityType: eligibilityType,
-              isValidGuardLicence: isValidGuardLicence,
-              securityGuardLicenseNo: securityGuardLicenseNo,
-              isDrive: isDrive,
-              levelOfEducation: levelOfEducation,
-              isEducationInCanada: isEducationInCanada,
-              isPriorExperienceInCanada: isPriorExperienceInCanada,
-              yearsOfExperience: yearsOfExperience,
-            },
-          }
-        )
-        .then(() => {
-          res.json({
-            message: 'User Updated Successfully!',
-          });
-        })
-        .catch(() => {
-          res.json({
-            error: 'User Updation Failed!',
-          });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({
+          error: 'User Updation Failed!',
         });
-    });
-  }
+      });
+  });
 };
 
 const signin = async (req, res) => {
@@ -201,7 +203,7 @@ const signin = async (req, res) => {
       });
     }
 
-    let expiryTime = new Date();
+    const expiryTime = new Date();
     expiryTime.setMonth(expiryTime.getMonth() + 6);
     const exp = parseInt(expiryTime.getTime() / 1000);
 
@@ -238,7 +240,7 @@ const isValidToken = (err, req, res, next) => {
 };
 
 const isAuthenticated = (req, res, next) => {
-  let checker = req.profile && req.auth && req.profile._id == req.auth._id;
+  const checker = req.profile && req.auth && req.profile._id == req.auth._id;
 
   if (!checker) {
     return res.status(403).json({
@@ -248,8 +250,29 @@ const isAuthenticated = (req, res, next) => {
   next();
 };
 
+const isEmployee = (req, res, next) => {
+  const authId = req.auth._id;
+
+  if (authId) {
+    User.findById(authId).exec((err, user) => {
+      if (err || !user) {
+        return res.status(400).json({
+          error: 'No user was found in DB',
+        });
+      }
+      if (user.role === 2) {
+        next();
+      } else {
+        return res.status(401).json({
+          error: 'Not an Employee!',
+        });
+      }
+    });
+  }
+};
+
 const isAdmin = (req, res, next) => {
-  let authId = req.auth._id;
+  const authId = req.auth._id;
 
   if (authId) {
     User.findById(authId).exec((err, user) => {
@@ -278,4 +301,5 @@ module.exports = {
   isValidToken,
   isAuthenticated,
   isAdmin,
+  isEmployee,
 };
