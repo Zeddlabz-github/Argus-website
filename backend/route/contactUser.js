@@ -3,6 +3,7 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
 const {
   saveData,
@@ -13,20 +14,20 @@ const {
 const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth');
 
 router.post('/contact-user/save', saveData);
-router.get('/contact-user/get/:id', isSignedIn, isValidToken, isAdmin , getData);
+router.get('/contact-user/get/:id', isSignedIn, isValidToken, isAdmin, getData);
 router.get(
   '/contact-user/get-all',
   isSignedIn,
   isValidToken,
   isAdmin,
-  getAllData
+  getAllData,
 );
 router.delete(
   '/contact-user/delete/:id',
   isSignedIn,
   isValidToken,
   isAdmin,
-  deleteDataById
+  deleteDataById,
 );
 
 module.exports = router;

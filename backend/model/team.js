@@ -2,9 +2,9 @@
  * @author krish
  */
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-let schema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -28,7 +28,7 @@ let schema = new mongoose.Schema(
       contentType: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = mongoose.model("team", schema, "team");
+module.exports = mongoose.model('team', schema, 'team');

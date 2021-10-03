@@ -1,12 +1,15 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable consistent-return */
 /**
  * @author krish
  */
 
-const model = require('../model/subscription');
 const { validationResult } = require('express-validator');
 
-let log4js = require('log4js');
-let logger = log4js.getLogger();
+const log4js = require('log4js');
+const Model = require('../model/subscription');
+
+const logger = log4js.getLogger();
 logger.level = 'debug';
 
 const saveData = (req, res) => {
@@ -16,30 +19,30 @@ const saveData = (req, res) => {
       error: errors.array()[0].msg,
     });
   }
-  let email = req.body.email;
+  const { email } = req.body;
 
   if (!email) {
     res.json({
       error: 'Please Include E-Mail',
     });
   } else {
-    let result = {
+    const result = {
       email,
     };
-    let subscriptionModel = new model(result);
-    model.findOne({ email }).exec((err, data) => {
+    const subscriptionModel = new Model(result);
+    Model.findOne({ email }).exec((err, data) => {
       if (err) {
         logger.error(err);
       }
 
       if (!data) {
-        subscriptionModel.save((err, data) => {
-          if (err) {
+        subscriptionModel.save((error, dataNew) => {
+          if (error) {
             res.status(400).json({
               error: 'Saving data in DB failed',
             });
           }
-          res.json(data);
+          res.json(dataNew);
         });
       } else {
         res.json({
@@ -51,7 +54,7 @@ const saveData = (req, res) => {
 };
 
 const getDataById = (req, res) => {
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
+  Model.findOne({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
@@ -66,7 +69,7 @@ const getDataById = (req, res) => {
 };
 
 const getAllData = (req, res) => {
-  model.find({}).exec((err, data) => {
+  Model.find({}).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
@@ -87,51 +90,50 @@ const updateDataById = (req, res) => {
       error: errors.array()[0].msg,
     });
   }
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
+  Model.findOne({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
-    if(!data) {
-      res.status(404).json(({
-        'error' : 'No record found!'
-      }))
+    if (!data) {
+      res.status(404).json({
+        error: 'No record found!',
+      });
     } else {
       let { email, isApproved } = req.body;
-    if (data.email === email) {
-      return res.json({
-        error: 'Please enter different E-Mail address to update',
-      });
-    }
-    !email ? (email = data.email) : email;
-    isApproved === undefined ? (isApproved = data.isApproved) : isApproved;
+      if (data.email === email) {
+        return res.json({
+          error: 'Please enter different E-Mail address to update',
+        });
+      }
+      !email ? (email = data.email) : email;
+      isApproved === undefined ? (isApproved = data.isApproved) : isApproved;
 
-    model
-      .updateOne(
+      Model.updateOne(
         { _id: req.params.id },
         {
           $set: {
-            email: email,
-            isApproved: isApproved,
+            email,
+            isApproved,
           },
-        }
+        },
       )
-      .then(() => {
-        res.json({
-          message: 'User Updated Successfully!',
+        .then(() => {
+          res.json({
+            message: 'User Updated Successfully!',
+          });
+        })
+        .catch((error) => {
+          logger.error(error);
+          res.json({
+            error: 'User Updation Failed!',
+          });
         });
-      })
-      .catch((err) => {
-        logger.error(err);
-        res.json({
-          error: 'User Updation Failed!',
-        });
-      });
     }
   });
 };
 
 const deleteDataById = (req, res) => {
-  model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
+  Model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }

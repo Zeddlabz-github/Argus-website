@@ -2,9 +2,9 @@
  * @author krish
  */
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-let schema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     email: String,
     isApproved: {
@@ -12,7 +12,7 @@ let schema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = mongoose.model("subscription", schema, "subscription");
+module.exports = mongoose.model('subscription', schema, 'subscription');

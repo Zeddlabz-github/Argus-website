@@ -2,7 +2,8 @@
  * @author krish
  */
 
-const express = require("express");
+const express = require('express');
+
 const router = express.Router();
 const {
   saveData,
@@ -11,26 +12,26 @@ const {
   updateDataById,
   deleteDataById,
   getPhoto,
-} = require("../controller/client");
-const { isSignedIn, isValidToken, isAdmin } = require("../controller/auth");
+} = require('../controller/client');
+const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth');
 
-router.post("/client/create", isSignedIn, isValidToken, isAdmin, saveData);
-router.get("/client/get/:id", getDataById);
-router.get("/client/get-all", getAllData);
+router.post('/client/create', isSignedIn, isValidToken, isAdmin, saveData);
+router.get('/client/get/:id', getDataById);
+router.get('/client/get-all', getAllData);
 router.put(
-  "/client/update/:id",
+  '/client/update/:id',
   isSignedIn,
   isValidToken,
   isAdmin,
-  updateDataById
+  updateDataById,
 );
-router.get("/client/get-photo/:id", getPhoto);
+router.get('/client/get-photo/:id', getPhoto);
 router.delete(
-  "/client/delete/:id",
+  '/client/delete/:id',
   isSignedIn,
   isValidToken,
   isAdmin,
-  deleteDataById
+  deleteDataById,
 );
 
 module.exports = router;

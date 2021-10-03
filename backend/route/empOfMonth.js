@@ -3,6 +3,7 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
 const {
   saveData,
@@ -25,7 +26,7 @@ router.get(
   isSignedIn,
   isValidToken,
   isAdmin,
-  getDataByMonth
+  getDataByMonth,
 );
 router.get('/eom/get-all', isSignedIn, isValidToken, isAdmin, getAllData);
 router.put(
@@ -33,14 +34,14 @@ router.put(
   isSignedIn,
   isValidToken,
   isAdmin,
-  updateDataById
+  updateDataById,
 );
 router.delete(
   '/eom/delete/:id',
   isSignedIn,
   isValidToken,
   isAdmin,
-  deleteDataById
+  deleteDataById,
 );
 
 module.exports = router;

@@ -1,10 +1,11 @@
+/* eslint-disable linebreak-style */
 /**
  * @author krish
  */
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-let schema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -37,7 +38,7 @@ let schema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = mongoose.model("testimonial", schema, "testimonial");
+module.exports = mongoose.model('testimonial', schema, 'testimonial');

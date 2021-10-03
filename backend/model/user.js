@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /**
  * @author krish
  */
@@ -6,9 +7,9 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const { v1: uuidv1 } = require('uuid');
 
-let schema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
-    //personal info
+    // personal info
     name: {
       type: String,
       maxlength: 32,
@@ -57,7 +58,7 @@ let schema = new mongoose.Schema(
       default: null,
     },
 
-    //contact Info
+    // contact Info
     email: {
       type: String,
       required: true,
@@ -112,7 +113,7 @@ let schema = new mongoose.Schema(
       default: null,
     },
 
-    //work status
+    // work status
     isElilligibeToWorkInCanada: {
       type: String,
       enum: ['YES', 'NO', null],
@@ -139,7 +140,7 @@ let schema = new mongoose.Schema(
       default: null,
     },
 
-    //education
+    // education
     levelOfEducation: {
       type: String,
       trim: true,
@@ -151,7 +152,7 @@ let schema = new mongoose.Schema(
       default: null,
     },
 
-    //experience
+    // experience
     isPriorExperienceInCanada: {
       type: String,
       enum: ['YES', 'NO', null],
@@ -163,7 +164,7 @@ let schema = new mongoose.Schema(
       default: null,
     },
 
-    //employment record
+    // employment record
     category: {
       type: String,
       trim: true,
@@ -202,7 +203,7 @@ let schema = new mongoose.Schema(
       default: null,
     },
 
-    //background declaration
+    // background declaration
     hasCriminalRecord: {
       type: String,
       enum: ['YES', 'NO', null],
@@ -221,7 +222,7 @@ let schema = new mongoose.Schema(
       default: null,
     },
 
-    //credentials
+    // credentials
     encrypted_password: {
       type: String,
       required: true,
@@ -234,7 +235,7 @@ let schema = new mongoose.Schema(
       default: 1,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 schema
@@ -250,11 +251,11 @@ schema
   });
 
 schema.methods = {
-  authenticate: function (password) {
+  authenticate(password) {
     return this.securePassword(password) === this.encrypted_password;
   },
 
-  securePassword: function (password) {
+  securePassword(password) {
     if (!password) return '';
 
     try {

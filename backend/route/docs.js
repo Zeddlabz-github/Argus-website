@@ -3,6 +3,7 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
 const {
   uploadData,
@@ -23,7 +24,7 @@ router.delete(
   isSignedIn,
   isValidToken,
   isAdmin,
-  deleteDataById
+  deleteDataById,
 );
 
 router.delete(
@@ -31,7 +32,7 @@ router.delete(
   isSignedIn,
   isValidToken,
   isAdmin,
-  deleteDocs
+  deleteDocs,
 );
 
 module.exports = router;

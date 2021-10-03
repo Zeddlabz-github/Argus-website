@@ -1,19 +1,28 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-undef */
+/* eslint-disable new-cap */
+/* eslint-disable consistent-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-restricted-syntax */
 /**
  * @author krish
  */
 
-const model = require('../model/docs');
 const formidable = require('formidable');
 const fs = require('fs');
 const _ = require('lodash');
 
-let log4js = require('log4js');
-let logger = log4js.getLogger();
+const log4js = require('log4js');
+const model = require('../model/docs');
+
+const logger = log4js.getLogger();
 logger.level = 'debug';
 
 const getObjSize = (obj) => {
-  let size = 0,
-    key;
+  let size = 0;
+  let key;
   for (key in obj) {
     if (obj.hasOwnProperty(key)) size++;
   }
@@ -22,7 +31,7 @@ const getObjSize = (obj) => {
 
 const uploadData = (req, res) => {
   const userId = req.auth._id;
-  let form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.parse(req, (err, fields, file) => {
     if (err) {
@@ -30,42 +39,40 @@ const uploadData = (req, res) => {
         error: 'problem with image',
       });
     }
-    model.findOne({ userId }).exec((err, data) => {
-      if (err) {
+    model.findOne({ userId }).exec((error, data) => {
+      if (error) {
         logger.error(err);
       }
       if (data) {
         res.status(400).json({
           error: 'Document is already available for this user',
         });
+      } else if (getObjSize(file)) {
+        let savedDoc = 0;
+        const newModel = new model();
+        newModel.userId = userId;
+        _.forIn(file, (value, key) => {
+          if (value.size > 3000000) {
+            logger.info(`File size is too big for ${doc}`);
+          } else {
+            savedDoc++;
+            newModel[key].name = value.name;
+            newModel[key].data = fs.readFileSync(value.path);
+            newModel[key].contentType = value.type;
+          }
+        });
+        newModel.save((er) => {
+          if (er) {
+            logger.error(er);
+          }
+          res.status(200).json({
+            message: `${savedDoc} Document saved successfully!`,
+          });
+        });
       } else {
-        if (getObjSize(file)) {
-          let savedDoc = 0;
-          const newModel = new model();
-          newModel.userId = userId;
-          _.forIn(file, (value, key) => {
-            if (value.size > 3000000) {
-              logger.info(`File size is too big for ${doc}`);
-            } else {
-              savedDoc++;
-              newModel[key].name = value.name;
-              newModel[key].data = fs.readFileSync(value.path);
-              newModel[key].contentType = value.type;
-            }
-          });
-          newModel.save((err, data) => {
-            if (err) {
-              logger.error(err);
-            }
-            res.status(200).json({
-              message: `${savedDoc} Document saved successfully!`,
-            });
-          });
-        } else {
-          res.status(404).json({
-            message: 'File Not Found',
-          });
-        }
+        res.status(404).json({
+          message: 'File Not Found',
+        });
       }
     });
   });
@@ -73,7 +80,7 @@ const uploadData = (req, res) => {
 
 const updateData = (req, res) => {
   const userId = req.auth._id;
-  let form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.parse(req, (err, fields, file) => {
     if (err) {
@@ -81,12 +88,14 @@ const updateData = (req, res) => {
         error: 'problem with image',
       });
     }
-    model.findOne({ userId }).exec((err, data) => {
-      if (err) {
-        logger.error(err);
+    model.findOne({ userId }).exec((error, data) => {
+      if (error) {
+        logger.error(error);
       }
       if (data) {
-        let fileName, fileData, fileType;
+        let fileName;
+        let fileData;
+        let fileType;
         if (getObjSize(file)) {
           let savedDoc = 0;
           _.forIn(file, (value, key) => {
@@ -108,7 +117,7 @@ const updateData = (req, res) => {
                         contentType: fileType,
                       },
                     },
-                  }
+                  },
                 )
                 .then(() => null);
             }
@@ -194,7 +203,7 @@ const deleteDataById = (req, res) => {
 
 const deleteDocs = (req, res) => {
   const userId = req.auth._id;
-  const docs = req.body.docs;
+  const { docs } = req.body;
 
   if (docs?.length) {
     model.findOne({ userId }).exec((err, data) => {
@@ -214,7 +223,7 @@ const deleteDocs = (req, res) => {
                     contentType: null,
                   },
                 },
-              }
+              },
             )
             .then(() => null);
         });

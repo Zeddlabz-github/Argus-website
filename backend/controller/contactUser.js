@@ -1,17 +1,18 @@
+/* eslint-disable new-cap */
 /**
  * @author krish
  */
 
+const log4js = require('log4js');
 const model = require('../model/contactUser');
 
-let log4js = require('log4js');
-let logger = log4js.getLogger();
+const logger = log4js.getLogger();
 logger.level = 'debug';
 
 const saveData = (req, res) => {
-  let { name, phoneNumber, message } = req.body;
-  let result = { name, phoneNumber, message };
-  let contactModel = new model(result);
+  const { name, phoneNumber, message } = req.body;
+  const result = { name, phoneNumber, message };
+  const contactModel = new model(result);
   contactModel.save((err, data) => {
     if (err) {
       res.status(400).json({

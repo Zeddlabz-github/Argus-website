@@ -4,151 +4,151 @@
 
 const mongoose = require('mongoose');
 
-let schema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     userId: mongoose.Schema.ObjectId,
     doc1: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc2: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc3: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc4: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc5: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc6: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc7: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc8: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc9: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
     doc10: {
-      name:  {
+      name: {
         type: String,
-        default: null
+        default: null,
       },
       data: {
         type: Buffer,
-        default: null
+        default: null,
       },
       contentType: {
         type: String,
-        default: null
+        default: null,
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model('userDocs', schema, 'userDocs');

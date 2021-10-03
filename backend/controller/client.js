@@ -1,17 +1,24 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-return-assign */
+/* eslint-disable no-param-reassign */
+/* eslint-disable new-cap */
+/* eslint-disable no-unused-vars */
+/* eslint-disable consistent-return */
 /**
  * @author krish
  */
 
-const model = require('../model/client');
 const formidable = require('formidable');
 const fs = require('fs');
 
-let log4js = require('log4js');
-let logger = log4js.getLogger();
+const log4js = require('log4js');
+const model = require('../model/client');
+
+const logger = log4js.getLogger();
 logger.level = 'debug';
 
 const saveData = (req, res) => {
-  let form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.parse(req, (err, fields, file) => {
     if (err) {
@@ -19,7 +26,7 @@ const saveData = (req, res) => {
         error: 'problem with image',
       });
     }
-    let { name, url } = fields;
+    const { name, url } = fields;
 
     if (!name) {
       return res.status(400).json({
@@ -27,7 +34,7 @@ const saveData = (req, res) => {
       });
     }
 
-    let clientModel = new model(fields);
+    const clientModel = new model(fields);
 
     if (file.logo) {
       if (file.logo.size > 3000000) {
@@ -38,8 +45,8 @@ const saveData = (req, res) => {
       clientModel.logo.data = fs.readFileSync(file.logo.path);
       clientModel.logo.contentType = file.logo.type;
     }
-    clientModel.save((err, data) => {
-      if (err) {
+    clientModel.save((error, data) => {
+      if (error) {
         res.status(400).json({
           error: 'Saving data in DB failed',
         });
@@ -83,7 +90,7 @@ const getAllData = (req, res) => {
 };
 
 const getPhoto = (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   model.findOne({ _id: id }).exec((err, data) => {
     if (err) {
       logger.error(err);
@@ -91,23 +98,22 @@ const getPhoto = (req, res) => {
     if (data) {
       res.set('Content-Type', data.logo.contentType);
       return res.send(data.logo.data);
-    } else {
-      res.json({
-        message: 'No Record found!',
-      });
     }
+    res.json({
+      message: 'No Record found!',
+    });
   });
 };
 
 const updateDataById = (req, res) => {
-  let form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.keepExtensions = true;
   model.findOne({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
-    form.parse(req, (err, fields, file) => {
-      if (err) {
+    form.parse(req, (error, fields, file) => {
+      if (error) {
         return res.status(400).json({
           error: 'problem with image',
         });
@@ -117,7 +123,8 @@ const updateDataById = (req, res) => {
       !name ? (name = data.name) : name;
       !url ? (url = data.url) : url;
 
-      let clientData, type;
+      let clientData;
+      let type;
       if (file.logo) {
         if (file.logo.size > 3000000) {
           return res.status(400).json({
@@ -136,14 +143,14 @@ const updateDataById = (req, res) => {
           { _id: req.params.id },
           {
             $set: {
-              name: name,
-              url: url,
+              name,
+              url,
               logo: {
                 data: clientData,
                 contentType: type,
               },
             },
-          }
+          },
         )
         .then(() => {
           res.json({

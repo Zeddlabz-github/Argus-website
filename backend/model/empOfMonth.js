@@ -2,9 +2,9 @@
  * @author krish
  */
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-let schema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     empName: String,
     empDesc: String,
@@ -64,7 +64,7 @@ let schema = new mongoose.Schema(
       length: 4,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = mongoose.model("empOfMonth", schema, "empOfMonth");
+module.exports = mongoose.model('empOfMonth', schema, 'empOfMonth');

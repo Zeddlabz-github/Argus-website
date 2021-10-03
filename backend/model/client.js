@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose');
 
-let schema = new mongoose.Schema(
+const schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -18,7 +18,7 @@ let schema = new mongoose.Schema(
     },
     url: String,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model('client', schema, 'client');

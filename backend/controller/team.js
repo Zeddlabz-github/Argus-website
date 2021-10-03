@@ -1,67 +1,72 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable consistent-return */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 /**
  * @author krish
  */
 
-const model = require("../model/team");
-const formidable = require("formidable");
-const fs = require("fs");
+const formidable = require('formidable');
+const fs = require('fs');
 
-let log4js = require("log4js");
-let logger = log4js.getLogger();
-logger.level = "debug";
+const log4js = require('log4js');
+const Model = require('../model/team');
+
+const logger = log4js.getLogger();
+logger.level = 'debug';
 
 const saveData = (req, res) => {
-  let form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.parse(req, (err, fields, file) => {
     if (err) {
       return res.status(400).json({
-        error: "problem with image",
+        error: 'problem with image',
       });
     }
-    let { name, role, description } = fields;
+    const { name, role, description } = fields;
 
     if (!name) {
       return res.status(400).json({
-        error: "Please include name!",
+        error: 'Please include name!',
       });
     }
     if (!role) {
       return res.status(400).json({
-        error: "Please include role!",
+        error: 'Please include role!',
       });
     }
     if (!description) {
       return res.status(400).json({
-        error: "Please include description!",
+        error: 'Please include description!',
       });
     }
 
-    let teamModel = new model(fields);
+    const teamModel = new Model(fields);
 
     if (file.photo) {
       if (file.photo.size > 3000000) {
         return res.status(400).json({
-          error: "File size too big!",
+          error: 'File size too big!',
         });
       }
       teamModel.photo.data = fs.readFileSync(file.photo.path);
       teamModel.photo.contentType = file.photo.type;
     }
-    teamModel.save((err, data) => {
-      if (err) {
+    teamModel.save((error, data) => {
+      if (error) {
         res.status(400).json({
-          error: "Saving data in DB failed",
+          error: 'Saving data in DB failed',
         });
       }
       data.photo = undefined;
-      res.json(data);
+      return res.json(data);
     });
   });
 };
 
 const getDataById = (req, res) => {
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
+  Model.findOne({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
@@ -70,14 +75,14 @@ const getDataById = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
 };
 
 const getAllData = (req, res) => {
-  model.find({}, { photo: 0 }).exec((err, data) => {
+  Model.find({}, { photo: 0 }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
@@ -86,40 +91,39 @@ const getAllData = (req, res) => {
       res.send(data);
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });
 };
 
 const getPhoto = (req, res) => {
-  const id = req.params.id;
-  model.findOne({ _id: id }).exec((err, data) => {
+  const { id } = req.params;
+  Model.findOne({ _id: id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
     if (data) {
-      res.set("Content-Type", data.photo.contentType);
+      res.set('Content-Type', data.photo.contentType);
       return res.send(data.photo.data);
-    } else {
-      res.json({
-        message: "No Record found!",
-      });
     }
+    res.json({
+      message: 'No Record found!',
+    });
   });
 };
 
 const updateDataById = (req, res) => {
-  let form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.keepExtensions = true;
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
+  Model.findOne({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
-    form.parse(req, (err, fields, file) => {
-      if (err) {
+    form.parse(req, (error, fields, file) => {
+      if (error) {
         return res.status(400).json({
-          error: "problem with image",
+          error: 'problem with image',
         });
       }
       let { name, role, description } = fields;
@@ -128,11 +132,12 @@ const updateDataById = (req, res) => {
       !role ? (role = data.role) : role;
       !description ? (description = data.description) : description;
 
-      let teamData, type;
+      let teamData;
+      let type;
       if (file.photo) {
         if (file.photo.size > 3000000) {
           return res.status(400).json({
-            error: "File size too big!",
+            error: 'File size too big!',
           });
         }
         teamData = fs.readFileSync(file.photo.path);
@@ -142,29 +147,28 @@ const updateDataById = (req, res) => {
         type = data.photo.contentType;
       }
 
-      model
-        .updateOne(
-          { _id: req.params.id },
-          {
-            $set: {
-              name: name,
-              role: role,
-              description: description,
-              photo: {
-                data: teamData,
-                contentType: type,
-              },
+      Model.updateOne(
+        { _id: req.params.id },
+        {
+          $set: {
+            name,
+            role,
+            description,
+            photo: {
+              data: teamData,
+              contentType: type,
             },
-          }
-        )
+          },
+        },
+      )
         .then(() => {
           res.json({
-            message: "User Updated Successfully!",
+            message: 'User Updated Successfully!',
           });
         })
         .catch(() => {
           res.json({
-            error: "User Updation Failed!",
+            error: 'User Updation Failed!',
           });
         });
     });
@@ -172,17 +176,17 @@ const updateDataById = (req, res) => {
 };
 
 const deleteDataById = (req, res) => {
-  model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
+  Model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
     if (err) {
       logger.error(err);
     }
     if (data) {
       res.json({
-        message: "Document deleted successfully!",
+        message: 'Document deleted successfully!',
       });
     } else {
       res.json({
-        message: "No Record found!",
+        message: 'No Record found!',
       });
     }
   });

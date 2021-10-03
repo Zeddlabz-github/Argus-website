@@ -3,6 +3,7 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
 const { check } = require('express-validator');
 const {
@@ -12,7 +13,8 @@ const {
   signout,
   isSignedIn,
   isValidToken,
-  isAdmin,
+  googlelogin,
+  facebooklogin,
 } = require('../controller/auth');
 
 router.post(
@@ -23,7 +25,7 @@ router.post(
       .isLength({ min: 6 })
       .withMessage('Password length should be minimum of 8 characters'),
   ],
-  signup
+  signup,
 );
 
 router.post(
@@ -34,21 +36,24 @@ router.post(
       .isLength({ min: 1 })
       .withMessage('Password field is required'),
   ],
-  signin
+  signin,
 );
+
+router.post('/googlelogin', googlelogin);
+
+router.post('/facebooklogin', facebooklogin);
 
 router.put(
   '/user/update',
   [check('id').isUUID().withMessage('Please Provide id')],
   isSignedIn,
   isValidToken,
-  isAdmin,
-  update
+  update,
 );
 
 router.get('/signout', signout);
 
-//just for test TODO: LATER DELETE IT
+// just for test TODO: LATER DELETE IT
 router.get('/testroute', isSignedIn, (req, res) => {
   res.json(req.auth);
 });
