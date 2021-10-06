@@ -1,9 +1,8 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-//logger
-let log4js = require("log4js");
+let log4js = require('log4js');
 let logger = log4js.getLogger();
-logger.level = "debug";
+logger.level = 'debug';
 
 const connection = async () => {
   try {
@@ -12,9 +11,9 @@ const connection = async () => {
       useUnifiedTopology: true,
       useFindAndModify: true,
     });
-    logger.info("DB Connected Successfully");
+    logger.info('DB Connected Successfully');
   } catch (error) {
-    logger.error("DB Connection Failed");
+    logger.error('DB Connection Failed');
   }
 };
 

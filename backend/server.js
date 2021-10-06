@@ -16,6 +16,7 @@ let log4js = require('log4js');
 let logger = log4js.getLogger();
 logger.level = 'debug';
 
+//mongo connection func call
 mongo();
 
 //routes
@@ -30,6 +31,7 @@ const contactUser = require('./route/contactUser');
 const client = require('./route/client');
 const team = require('./route/team');
 const userActivity = require('./route/userActivity');
+const calenderEvent = require('./route/calenderEvent');
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -48,6 +50,7 @@ app.use('/api', contactUser);
 app.use('/api', client);
 app.use('/api', team);
 app.use('/api', userActivity);
+app.use('/api', calenderEvent);
 
 const PORT = 8000;
 

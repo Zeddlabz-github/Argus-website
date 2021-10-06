@@ -84,7 +84,7 @@ const getOtherUserData = (req, res) => {
   };
   let userId;
   if (req.query.userId === undefined) {
-    res.status(200).json({
+    res.status(400).json({
       error: 'Please pass userId as a query parameter',
     });
   } else {
@@ -175,7 +175,7 @@ const getAllUserData = async (req, res) => {
   if (result.length) {
     res.status(200).send(result);
   } else {
-    res.status(400).json({
+    res.status(404).json({
       error: 'No Activites found!',
     });
   }
@@ -189,7 +189,7 @@ const deleteDataById = (req, res) => {
         logger.error(err);
       }
       if (data) {
-        res.json({
+        res.status(200).json({
           message: 'Activity deleted successfully!',
         });
       } else {
