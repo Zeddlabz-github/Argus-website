@@ -13,8 +13,8 @@ const {
   isSignedIn,
   isValidToken,
   isAdmin,
-  googlelogin,
-  facebooklogin,
+  googleLogin,
+  facebookLogin,
 } = require('../controller/auth');
 
 router.post(
@@ -39,9 +39,9 @@ router.post(
   signin
 );
 
-router.post('/googlelogin', googlelogin);
+router.post('/googlelogin', googleLogin);
 
-router.post('/facebooklogin', facebooklogin);
+router.post('/facebooklogin', facebookLogin);
 
 router.put(
   '/user/update',

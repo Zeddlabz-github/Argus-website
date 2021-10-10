@@ -2,11 +2,11 @@
  * @author krish
  */
 
-const model = require('../model/calenderEvent');
+const calenderEventModel = require('../model/calenderEvent');
 const mongoose = require('mongoose');
 
-let log4js = require('log4js');
-let logger = log4js.getLogger();
+const log4js = require('log4js');
+const logger = log4js.getLogger();
 logger.level = 'debug';
 
 const addEvent = async (req, res) => {
@@ -24,15 +24,18 @@ const addEvent = async (req, res) => {
     result.endTime = endTime;
     result.users = users;
 
-    const calenderEventModel = new model(result);
-    calenderEventModel.save((err, data) => {
+    const calenderEvent = new calenderEventModel(result);
+    calenderEvent.save((err, data) => {
       if (err) {
         logger.error(err);
         res.status(400).json({
           error: 'Saving data in DB failed',
         });
       }
-      res.status(200).json(data);
+      res.status(200).json({
+        message: 'Event Added Sucessfully!',
+        data: data,
+      });
     });
   } catch (err) {
     logger.error(err);
@@ -45,9 +48,12 @@ const updateEvent = async (req, res) => {
   const id = req.params.id;
   let { title, startTime, endTime, users, userEventType } = req.body;
   try {
-    await model.findOne({ _id: id }).exec((err, data) => {
+    await calenderEventModel.findOne({ _id: id }).exec((err, data) => {
       if (err) {
         logger.error(err);
+        res.status(400).json({
+          error: 'Updating Calender Event in DB is failed!',
+        });
       }
       if (data) {
         title === undefined ? (title = data.title) : null;
@@ -71,7 +77,7 @@ const updateEvent = async (req, res) => {
               error: 'Given user in the users array not found on DB',
             });
 
-        model
+        calenderEventModel
           .updateOne(
             { _id: id },
             {
@@ -95,7 +101,7 @@ const updateEvent = async (req, res) => {
           });
       } else {
         res.status(404).json({
-          message: 'No Events found!',
+          error: 'No Events found!',
         });
       }
     });
@@ -108,18 +114,26 @@ const updateEvent = async (req, res) => {
 
 const getEventById = async (req, res) => {
   try {
-    await model.findOne({ _id: req.params.id }).exec((err, data) => {
-      if (err) {
-        logger.error(err);
-      }
-      if (data) {
-        res.status(200).send(data);
-      } else {
-        res.status(404).json({
-          message: 'No Event found!',
-        });
-      }
-    });
+    await calenderEventModel
+      .findOne({ _id: req.params.id })
+      .exec((err, data) => {
+        if (err) {
+          res.status(400).json({
+            error: 'Getting Calender Event from DB is failed!',
+          });
+          logger.error(err);
+        }
+        if (data) {
+          res.status(200).send({
+            message: 'Calender Event Fetched Sucessfully',
+            data: data,
+          });
+        } else {
+          res.status(404).json({
+            error: 'No Event found!',
+          });
+        }
+      });
   } catch (err) {
     logger.info(err);
   } finally {
@@ -130,8 +144,8 @@ const getEventById = async (req, res) => {
 const getUserEvents = async (req, res) => {
   const id = req.params.userId;
   try {
-    let userId = mongoose.Types.ObjectId(id);
-    const result = await model
+    const userId = mongoose.Types.ObjectId(id);
+    const result = await calenderEventModel
       .aggregate([
         {
           $match: {
@@ -152,7 +166,10 @@ const getUserEvents = async (req, res) => {
         },
       ])
       .sort({ _id: -1 });
-    res.status(200).send(result);
+    res.status(200).send({
+      message: 'User Calender Event Fetched Sucessfully',
+      data: result,
+    });
   } catch (err) {
     logger.error(err);
   } finally {
@@ -162,15 +179,21 @@ const getUserEvents = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
   try {
-    await model.find({}).exec((err, data) => {
+    await calenderEventModel.find({}).exec((err, data) => {
       if (err) {
+        res.status(400).json({
+          error: 'Getting All Calender Events from DB is failed!',
+        });
         logger.error(err);
       }
       if (data) {
-        res.status(200).send(data);
+        res.status(200).send({
+          message: 'All Calender Events Fetched Sucessfully',
+          data: data,
+        });
       } else {
         res.status(404).json({
-          message: 'No Events found!',
+          error: 'No Events found!',
         });
       }
     });
@@ -183,20 +206,25 @@ const getAllEvents = async (req, res) => {
 
 const deleteEventById = async (req, res) => {
   try {
-    await model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
-      if (err) {
-        logger.error(err);
-      }
-      if (data) {
-        res.status(200).json({
-          message: 'Calender Event deleted successfully!',
-        });
-      } else {
-        res.status(404).json({
-          message: 'No Events found!',
-        });
-      }
-    });
+    await calenderEventModel
+      .findByIdAndDelete({ _id: req.params.id })
+      .exec((err, data) => {
+        if (err) {
+          res.status(400).json({
+            error: 'Deleting Calender Event from DB is failed!',
+          });
+          logger.error(err);
+        }
+        if (data) {
+          res.status(200).json({
+            message: 'Calender Event deleted successfully!',
+          });
+        } else {
+          res.status(404).json({
+            error: 'No Events found!',
+          });
+        }
+      });
   } catch (err) {
     logger.error(err);
   } finally {
@@ -209,7 +237,7 @@ const deleteUserEvents = async (req, res) => {
   const userId = req.body.userId;
 
   try {
-    await model
+    await calenderEventModel
       .updateOne(
         { _id: id },
         {
@@ -225,8 +253,14 @@ const deleteUserEvents = async (req, res) => {
       .then((data) => {
         logger.info(data);
         res.status(200).json({
-          message: 'user deleted successfully!',
+          message: 'User Deleted Successfully From this Event!',
         });
+      })
+      .catch((err) => {
+        res.status(400).json({
+          error: 'Deleting User Event is failed!',
+        });
+        logger.error(err);
       });
   } catch (err) {
     logger.error(err);
@@ -239,7 +273,7 @@ const deleteAllUserEvents = async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    await model
+    await calenderEventModel
       .updateMany(
         {
           users: {
@@ -260,8 +294,14 @@ const deleteAllUserEvents = async (req, res) => {
       )
       .then(() => {
         res.status(200).json({
-          message: 'user deleted successfully!',
+          message: 'User Deleted Successfully From all Events!',
         });
+      })
+      .catch((err) => {
+        res.status(400).json({
+          error: 'Deleting All User Events is failed!',
+        });
+        logger.error(err);
       });
   } catch (err) {
     logger.error(err);
@@ -272,8 +312,11 @@ const deleteAllUserEvents = async (req, res) => {
 
 const deleteAllEvents = async (req, res) => {
   try {
-    await model.deleteMany({}).exec((err, data) => {
+    await calenderEventModel.deleteMany({}).exec((err, data) => {
       if (err) {
+        res.status(400).json({
+          error: 'Deleting All Calender Events from DB is failed!',
+        });
         logger.error(err);
       }
       if (data) {
@@ -282,7 +325,7 @@ const deleteAllEvents = async (req, res) => {
         });
       } else {
         res.status(404).json({
-          message: 'No Events found!',
+          error: 'No Events found!',
         });
       }
     });

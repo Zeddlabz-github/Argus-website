@@ -2,11 +2,10 @@
  * @author krish
  */
 
-const User = require('../model/user.js');
-const { validationResult } = require('express-validator');
+const userModel = require('../model/user.js');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 const expressJwt = require('express-jwt');
-const user = require('../model/user.js');
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const { OAuth2Client } = require('google-auth-library');
@@ -19,28 +18,38 @@ const signup = async (req, res) => {
     });
   }
   const { email } = req.body;
-  await User.findOne({ email }, (err, user) => {
-    if (err || user) {
-      return res.status(400).json({
-        error: 'E-Mail already has been registered',
-        suggestion: 'Try some other E-mail',
-      });
-    } else {
-      const user = new User(req.body);
-      user.save((err, user) => {
-        if (err) {
-          return res.status(400).json({
-            err: 'Failed to add user in DB',
-          });
-        }
-        res.json({
-          id: user._id,
-          email: user.email,
-          password: user.encrypted_password,
+
+  try {
+    await userModel.findOne({ email }, (err, user) => {
+      if (err || user) {
+        return res.status(400).json({
+          error: 'E-Mail already has been registered',
+          suggestion: 'Try some other E-mail',
         });
-      });
-    }
-  });
+      } else {
+        const user = new userModel(req.body);
+        user.save((err, user) => {
+          if (err) {
+            return res.status(400).json({
+              err: 'Failed to add user in DB',
+            });
+          }
+          res.status(200).json({
+            message: 'User Signed Up Successfully!',
+            data: {
+              id: user._id,
+              email: user.email,
+              password: user.encrypted_password,
+            },
+          });
+        });
+      }
+    });
+  } catch (err) {
+    logger.error(err);
+  } finally {
+    logger.info(`User Signed Up with an Email - ${email}`);
+  }
 };
 
 const update = async (req, res) => {
@@ -85,102 +94,109 @@ const update = async (req, res) => {
   } = req.body;
 
   const id = req.auth._id;
-  await user.findOne({ _id: id }).exec((err, data) => {
-    if (err || !data) {
-      return res.status(400).json({
-        error: 'User Not Found!',
-      });
-    }
 
-    const arr = [];
-    arr.push(Object.keys(req.body));
-
-    arr
-      .filter((val) => val !== employeeDuration)
-      .forEach((ele) => {
-        if (ele === undefined && data[`${ele}`] !== null) {
-          ele = data[`${ele}`];
-        }
-      });
-
-    const employeeDt = {
-      from: null,
-      to: null,
-    };
-
-    if (employeeDuration !== undefined) {
-      if (employeeDuration.from !== undefined) {
-        employeeDt.from = employeeDuration.from;
-      }
-      if (employeeDuration.to !== undefined) {
-        employeeDt.to = employeeDuration.to;
-      }
-    } else {
-      if (data.employeeDuration.from !== null) {
-        employeeDt.from = data.employeeDuration.from;
-      }
-      if (data.employeeDuration.to !== null) {
-        employeeDt.to = data.employeeDuration.to;
-      }
-    }
-
-    user
-      .updateOne(
-        { _id: id },
-        {
-          $set: {
-            name,
-            lastname,
-            dateOfBirth,
-            gender,
-            weight,
-            height,
-            eyeColor,
-            hairColor,
-            languagesKnown,
-            phone,
-            homePhone,
-            address,
-            country,
-            city,
-            street,
-            streetNumber,
-            suite,
-            province,
-            postalCode,
-            isElilligibeToWorkInCanada,
-            eligibilityType,
-            isValidGuardLicence,
-            securityGuardLicenseNo,
-            isDrive,
-            levelOfEducation,
-            isEducationInCanada,
-            isPriorExperienceInCanada,
-            yearsOfExperience,
-            category,
-            companyName,
-            companyAddress,
-            employeeDuration: employeeDt,
-            isActive,
-            reasonForLeaving,
-            hasCriminalRecord,
-            hasVechicle,
-            hasLicenseToDrive,
-          },
-        }
-      )
-      .then(() => {
-        res.json({
-          message: 'User Updated Successfully!',
+  try {
+    await user.findOne({ _id: id }).exec((err, data) => {
+      if (err || !data) {
+        return res.status(404).json({
+          error: 'User Not Found!',
         });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.json({
-          error: 'User Updation Failed!',
+      }
+
+      const arr = [];
+      arr.push(Object.keys(req.body));
+
+      arr
+        .filter((val) => val !== employeeDuration)
+        .forEach((ele) => {
+          if (ele === undefined && data[`${ele}`] !== null) {
+            ele = data[`${ele}`];
+          }
         });
-      });
-  });
+
+      const employeeDt = {
+        from: null,
+        to: null,
+      };
+
+      if (employeeDuration !== undefined) {
+        if (employeeDuration.from !== undefined) {
+          employeeDt.from = employeeDuration.from;
+        }
+        if (employeeDuration.to !== undefined) {
+          employeeDt.to = employeeDuration.to;
+        }
+      } else {
+        if (data.employeeDuration.from !== null) {
+          employeeDt.from = data.employeeDuration.from;
+        }
+        if (data.employeeDuration.to !== null) {
+          employeeDt.to = data.employeeDuration.to;
+        }
+      }
+
+      user
+        .updateOne(
+          { _id: id },
+          {
+            $set: {
+              name,
+              lastname,
+              dateOfBirth,
+              gender,
+              weight,
+              height,
+              eyeColor,
+              hairColor,
+              languagesKnown,
+              phone,
+              homePhone,
+              address,
+              country,
+              city,
+              street,
+              streetNumber,
+              suite,
+              province,
+              postalCode,
+              isElilligibeToWorkInCanada,
+              eligibilityType,
+              isValidGuardLicence,
+              securityGuardLicenseNo,
+              isDrive,
+              levelOfEducation,
+              isEducationInCanada,
+              isPriorExperienceInCanada,
+              yearsOfExperience,
+              category,
+              companyName,
+              companyAddress,
+              employeeDuration: employeeDt,
+              isActive,
+              reasonForLeaving,
+              hasCriminalRecord,
+              hasVechicle,
+              hasLicenseToDrive,
+            },
+          }
+        )
+        .then(() => {
+          res.status(200).json({
+            message: 'User Updated Successfully!',
+          });
+        })
+        .catch((err) => {
+          logger.error(err);
+          res.status(400).json({
+            error: 'User Updation Failed!',
+          });
+        });
+    });
+  } catch (err) {
+    logger.error(err);
+  } finally {
+    logger.info('User Updation Function is Executed');
+  }
 };
 
 const signin = async (req, res) => {
@@ -194,43 +210,55 @@ const signin = async (req, res) => {
 
   const { email, password } = req.body;
 
-  await User.findOne({ email }, (err, user) => {
-    if (err || !user) {
-      return res.status(400).json({
-        error: "E-Mail doesn't exist in DB!",
+  try {
+    await userModel.findOne({ email }, (err, user) => {
+      if (err || !user) {
+        return res.status(404).json({
+          error: "E-Mail doesn't exist in DB!",
+        });
+      }
+      if (!user.authenticate(password)) {
+        return res.status(401).json({
+          error: 'E-mail and Password does not match',
+        });
+      }
+
+      const expiryTime = new Date();
+      expiryTime.setMonth(expiryTime.getMonth() + 6);
+      const exp = parseInt(expiryTime.getTime() / 1000);
+      const token = jwt.sign({ _id: user._id, exp: exp }, process.env.SECRET);
+
+      res.cookie('Token', token, { expire: new Date() + 9999 });
+
+      user.salt = undefined;
+      user.__v = undefined;
+      return res.status(200).json({
+        message: 'User Logged in Successfully!',
+        token,
+        user,
       });
-    }
-    if (!user.authenticate(password)) {
-      return res.status(401).json({
-        error: 'E-mail and Password does not match',
-      });
-    }
-
-    const expiryTime = new Date();
-    expiryTime.setMonth(expiryTime.getMonth() + 6);
-    const exp = parseInt(expiryTime.getTime() / 1000);
-
-    const token = jwt.sign({ _id: user._id, exp: exp }, process.env.SECRET);
-
-    res.cookie('Token', token, { expire: new Date() + 9999 });
-
-    user.salt = undefined;
-    user.__v = undefined;
-    return res.json({ token, user });
-  });
+    });
+  } catch (err) {
+    logger.error(err);
+  } finally {
+    logger.info(`User Signed in - ${email}`);
+  }
 };
 
 const signout = (req, res) => {
   res.clearCookie('Token');
 
-  res.json({
+  res.status(200).json({
     message: 'User Signed Out Sucessfully',
   });
 };
 
-const googlelogin = (req, res) => {
+const googleLogin = (req, res) => {
   try {
     const { idToken } = req.body;
+    const client = new OAuth2Client(
+      '687463143304-kpg02h4gpk2ul6a4fk3fnsbpp1hg241i.apps.googleusercontent.com'
+    );
     client
       .verifyIdToken({
         idToken,
@@ -241,7 +269,7 @@ const googlelogin = (req, res) => {
         const { email_verified, email, given_name, family_name } =
           response.payload;
         if (email_verified) {
-          User.findOne({ email }).exec((err, user) => {
+          userModel.findOne({ email }).exec((err, user) => {
             if (err) {
               return res.status(400).json({
                 error: 'Login failed try again',
@@ -260,10 +288,14 @@ const googlelogin = (req, res) => {
 
               user.salt = undefined;
               user.__v = undefined;
-              return res.json({ token, user });
+              return res.status(200).json({
+                message: 'User Logged in Successfully from Google!',
+                token,
+                user,
+              });
             } else {
               const encrypted_password = idToken + email;
-              const userNew = new User({
+              const userNew = new userModel({
                 email,
                 name: given_name,
                 lastname: family_name,
@@ -288,21 +320,28 @@ const googlelogin = (req, res) => {
 
                   data.salt = undefined;
                   data.__v = undefined;
-                  return res.json({ token, user: data });
+                  return res.status(200).json({
+                    message: 'User Logged in Successfully from Google!',
+                    token,
+                    user,
+                  });
                 }
               });
             }
           });
         }
       });
-  } catch (error) {
+  } catch (err) {
+    logger.error(err);
     return res.status(400).json({
       error: 'Login failed try again',
     });
+  } finally {
+    logger.info('User Logged in from Google!');
   }
 };
 
-const facebooklogin = async (req, res) => {
+const facebookLogin = async (req, res) => {
   try {
     const { userId, access_token } = req.body;
     const urlGraphFacebook = `https://graph.facebook.com/${userId}/?fields=id,first_name,last_name,email&access_token=${access_token}`;
@@ -355,16 +394,23 @@ const facebooklogin = async (req, res) => {
 
               data.salt = undefined;
               data.__v = undefined;
-              return res.json({ token, user: data });
+              return res.status(200).json({
+                message: 'User Logged in Successfully from Facebook!',
+                token,
+                user: data,
+              });
             }
           });
         }
       });
     }
-  } catch (error) {
+  } catch (err) {
+    logger.error(err);
     return res.status(400).json({
       error: 'Login failed try again',
     });
+  } finally {
+    logger.info('User Logged in from Facebook!');
   }
 };
 
@@ -397,9 +443,9 @@ const isEmployee = (req, res, next) => {
   const authId = req.auth._id;
 
   if (authId) {
-    User.findById(authId).exec((err, user) => {
+    userModel.findById(authId).exec((err, user) => {
       if (err || !user) {
-        return res.status(400).json({
+        return res.status(404).json({
           error: 'No user was found in DB',
         });
       }
@@ -418,9 +464,9 @@ const isAdmin = (req, res, next) => {
   const authId = req.auth._id;
 
   if (authId) {
-    User.findById(authId).exec((err, user) => {
+    userModel.findById(authId).exec((err, user) => {
       if (err || !user) {
-        return res.status(400).json({
+        return res.status(404).json({
           error: 'No user was found in DB',
         });
       }
@@ -445,6 +491,6 @@ module.exports = {
   isAuthenticated,
   isAdmin,
   isEmployee,
-  googlelogin,
-  facebooklogin,
+  googleLogin,
+  facebookLogin,
 };

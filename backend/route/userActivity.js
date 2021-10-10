@@ -5,12 +5,12 @@
 const express = require('express');
 const router = express.Router();
 const {
-  saveData,
-  getUserData,
-  getOtherUserData,
-  getAllUserData,
-  deleteDataById,
-  deleteAllDataByUserId,
+  createActivity,
+  getUserAvtivity,
+  getOtherUserActivity,
+  getAllUserActivities,
+  deleteActivityById,
+  deleteAllActivitiesByUserId,
 } = require('../controller/userActivity');
 const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth');
 
@@ -19,22 +19,22 @@ router.post(
   isSignedIn,
   isValidToken,
   isAdmin,
-  saveData
+  createActivity
 );
-router.get('/user-activity/get', isSignedIn, isValidToken, getUserData);
+router.get('/user-activity/get', isSignedIn, isValidToken, getUserAvtivity);
 router.get(
   '/user-activity/get-user',
   isSignedIn,
   isValidToken,
   isAdmin,
-  getOtherUserData
+  getOtherUserActivity
 );
 router.get(
   '/user-activity/get-all',
   isSignedIn,
   isValidToken,
   isAdmin,
-  getAllUserData
+  getAllUserActivities
 );
 
 router.delete(
@@ -42,7 +42,7 @@ router.delete(
   isSignedIn,
   isValidToken,
   isAdmin,
-  deleteDataById
+  deleteActivityById
 );
 
 router.delete(
@@ -50,7 +50,7 @@ router.delete(
   isSignedIn,
   isValidToken,
   isAdmin,
-  deleteAllDataByUserId
+  deleteAllActivitiesByUserId
 );
 
 module.exports = router;
