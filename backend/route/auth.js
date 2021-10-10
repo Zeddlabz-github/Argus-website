@@ -13,6 +13,8 @@ const {
   isSignedIn,
   isValidToken,
   isAdmin,
+  googlelogin,
+  facebooklogin,
 } = require('../controller/auth');
 
 router.post(
@@ -37,6 +39,10 @@ router.post(
   signin
 );
 
+router.post('/googlelogin', googlelogin);
+
+router.post('/facebooklogin', facebooklogin);
+
 router.put(
   '/user/update',
   [check('id').isUUID().withMessage('Please Provide id')],
@@ -47,10 +53,5 @@ router.put(
 );
 
 router.get('/signout', signout);
-
-//just for test TODO: LATER DELETE IT
-router.get('/testroute', isSignedIn, (req, res) => {
-  res.json(req.auth);
-});
 
 module.exports = router;

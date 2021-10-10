@@ -16,7 +16,7 @@ const saveData = (req, res) => {
     userName: '',
     activityDetails: '',
   };
-  const userId = req.auth._id;
+  const userId = req.params.userId;
   const activityDetails = req.body.activityDetails;
 
   userModel.findOne({ _id: userId }).exec((err, data) => {
@@ -52,14 +52,14 @@ const label = {
   docs: 'activities',
   limit: 'perPage',
   page: 'currentPage',
-  nextPage: 'next',
-  prevPage: 'prev',
+  nextPage: 'nextPageNo',
+  prevPage: 'prevPageNo',
   totalPages: 'pageCount',
 };
 
 const getUserData = (req, res) => {
   let options = {
-    page: 2,
+    page: 1,
     limit: 10,
     customLabels: label,
   };

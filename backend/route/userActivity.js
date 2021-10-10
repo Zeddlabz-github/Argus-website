@@ -14,7 +14,13 @@ const {
 } = require('../controller/userActivity');
 const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth');
 
-router.post('/user-activity/create', isSignedIn, isValidToken, isAdmin, saveData);
+router.post(
+  '/user-activity/create/:userId',
+  isSignedIn,
+  isValidToken,
+  isAdmin,
+  saveData
+);
 router.get('/user-activity/get', isSignedIn, isValidToken, getUserData);
 router.get(
   '/user-activity/get-user',

@@ -7,11 +7,13 @@ const router = express.Router();
 const {
   addEvent,
   updateEvent,
-  getEvents,
+  getEventById,
+  getUserEvents,
   getAllEvents,
   deleteEventById,
   deleteUserEvents,
   deleteAllEvents,
+  deleteAllUserEvents,
 } = require('../controller/calenderEvent');
 const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth');
 
@@ -29,7 +31,13 @@ router.put(
   isAdmin,
   updateEvent
 );
-router.get('/calender-event/get/:userId', isSignedIn, isValidToken, getEvents);
+router.get('/calender-event/get/:id', isSignedIn, isValidToken, getEventById);
+router.get(
+  '/calender-event/get/user/:userId',
+  isSignedIn,
+  isValidToken,
+  getUserEvents
+);
 router.get(
   '/calender-event/get-all',
   isSignedIn,
@@ -46,11 +54,18 @@ router.delete(
   deleteEventById
 );
 router.delete(
-  '/calender-event/delete-user/:userId',
+  '/calender-event/delete/user/:id',
   isSignedIn,
   isValidToken,
   isAdmin,
   deleteUserEvents
+);
+router.delete(
+  '/calender-event/delete-all/user/:userId',
+  isSignedIn,
+  isValidToken,
+  isAdmin,
+  deleteAllUserEvents
 );
 router.delete(
   '/calender-event/delete-all',

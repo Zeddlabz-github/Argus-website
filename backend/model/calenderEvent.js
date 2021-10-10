@@ -6,12 +6,16 @@ const mongoose = require('mongoose');
 
 let schema = new mongoose.Schema(
   {
-    userId: mongoose.Schema.ObjectId,
-    userName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    users: [
+      {
+        userId: mongoose.Schema.ObjectId,
+        userName: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+      },
+    ],
     title: {
       type: String,
       required: true,

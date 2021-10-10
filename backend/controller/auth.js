@@ -7,6 +7,9 @@ const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');
 const user = require('../model/user.js');
+const fetch = (...args) =>
+  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const { OAuth2Client } = require('google-auth-library');
 
 const signup = async (req, res) => {
   const errors = validationResult(req);
@@ -225,6 +228,146 @@ const signout = (req, res) => {
   });
 };
 
+const googlelogin = (req, res) => {
+  try {
+    const { idToken } = req.body;
+    client
+      .verifyIdToken({
+        idToken,
+        audience:
+          '687463143304-kpg02h4gpk2ul6a4fk3fnsbpp1hg241i.apps.googleusercontent.com',
+      })
+      .then((response) => {
+        const { email_verified, email, given_name, family_name } =
+          response.payload;
+        if (email_verified) {
+          User.findOne({ email }).exec((err, user) => {
+            if (err) {
+              return res.status(400).json({
+                error: 'Login failed try again',
+              });
+            } else if (user) {
+              const expiryTime = new Date();
+              expiryTime.setMonth(expiryTime.getMonth() + 6);
+              const exp = parseInt(expiryTime.getTime() / 1000);
+
+              const token = jwt.sign(
+                { _id: user._id, exp },
+                process.env.SECRET
+              );
+
+              res.cookie('Token', token, { expire: new Date() + 9999 });
+
+              user.salt = undefined;
+              user.__v = undefined;
+              return res.json({ token, user });
+            } else {
+              const encrypted_password = idToken + email;
+              const userNew = new User({
+                email,
+                name: given_name,
+                lastname: family_name,
+                encrypted_password,
+              });
+              userNew.save((err, data) => {
+                if (err) {
+                  return res.status(400).json({
+                    error: 'Failed to add user in DB',
+                  });
+                } else {
+                  const expiryTime = new Date();
+                  expiryTime.setMonth(expiryTime.getMonth() + 6);
+                  const exp = parseInt(expiryTime.getTime() / 1000);
+
+                  const token = jwt.sign(
+                    { _id: data._id, exp },
+                    process.env.SECRET
+                  );
+
+                  res.cookie('Token', token, { expire: new Date() + 9999 });
+
+                  data.salt = undefined;
+                  data.__v = undefined;
+                  return res.json({ token, user: data });
+                }
+              });
+            }
+          });
+        }
+      });
+  } catch (error) {
+    return res.status(400).json({
+      error: 'Login failed try again',
+    });
+  }
+};
+
+const facebooklogin = async (req, res) => {
+  try {
+    const { userId, access_token } = req.body;
+    const urlGraphFacebook = `https://graph.facebook.com/${userId}/?fields=id,first_name,last_name,email&access_token=${access_token}`;
+    const response = await fetch(urlGraphFacebook, {
+      method: 'GET',
+    });
+    const { email, first_name, last_name, id } = await response.json();
+    if (id === userId) {
+      User.findOne({ email }).exec((err, user) => {
+        if (err) {
+          return res.status(400).json({
+            error: 'Login failed try again',
+          });
+        } else if (user) {
+          const expiryTime = new Date();
+          expiryTime.setMonth(expiryTime.getMonth() + 6);
+          const exp = parseInt(expiryTime.getTime() / 1000);
+
+          const token = jwt.sign({ _id: user._id, exp }, process.env.SECRET);
+
+          res.cookie('Token', token, { expire: new Date() + 9999 });
+
+          user.salt = undefined;
+          user.__v = undefined;
+          return res.json({ token, user });
+        } else {
+          const encrypted_password = access_token + email;
+          const userNew = new User({
+            email,
+            name: first_name,
+            lastname: last_name,
+            encrypted_password,
+          });
+          userNew.save((err, data) => {
+            if (err) {
+              return res.status(400).json({
+                error: 'Failed to add user in DB',
+              });
+            } else {
+              const expiryTime = new Date();
+              expiryTime.setMonth(expiryTime.getMonth() + 6);
+              const exp = parseInt(expiryTime.getTime() / 1000);
+
+              const token = jwt.sign(
+                { _id: data._id, exp },
+                process.env.SECRET
+              );
+
+              res.cookie('Token', token, { expire: new Date() + 9999 });
+
+              data.salt = undefined;
+              data.__v = undefined;
+              return res.json({ token, user: data });
+            }
+          });
+        }
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({
+      error: 'Login failed try again',
+    });
+  }
+};
+
 const isSignedIn = expressJwt({
   secret: process.env.SECRET,
   algorithms: ['HS256', 'RS256'],
@@ -302,4 +445,6 @@ module.exports = {
   isAuthenticated,
   isAdmin,
   isEmployee,
+  googlelogin,
+  facebooklogin,
 };
