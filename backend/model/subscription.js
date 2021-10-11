@@ -2,17 +2,17 @@
  * @author krish
  */
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
 let schema = new mongoose.Schema(
-  {
-    email: String,
-    isApproved: {
-      type: Boolean,
-      default: true,
+    {
+        email: String,
+        isApproved: {
+            type: Boolean,
+            default: true
+        }
     },
-  },
-  { timestamps: true }
-);
+    { timestamps: true }
+)
 
-module.exports = mongoose.model("subscription", schema, "subscription");
+module.exports = mongoose.model('subscription', schema, 'subscription')
