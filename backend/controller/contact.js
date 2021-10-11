@@ -4,7 +4,6 @@
 
 const model = require('../model/contact');
 const { validationResult } = require('express-validator');
-
 let log4js = require('log4js');
 let logger = log4js.getLogger();
 logger.level = 'debug';
@@ -38,8 +37,8 @@ const updateData = (req, res) => {
       let id = data._id;
       let phoneNumber = req.body.phoneNumber,
         email = req.body.email,
-        address = req.body.address;
-      mapLocation = req.body.mapLocation;
+        address = req.body.address,
+        mapLocation = req.body.mapLocation;
       if (req.body.phoneNumber === undefined) {
         phoneNumber = defaultData.phoneNumber;
       }
