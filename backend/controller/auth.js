@@ -6,14 +6,21 @@ const userModel = require('../model/user.js');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const expressJwt = require('express-jwt');
+
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const { OAuth2Client } = require('google-auth-library');
 
+const log4js = require('log4js');
+const logger = log4js.getLogger();
+logger.level = 'debug';
+
+const { statusCode } = require('../utils/statusCode');
+
 const signup = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(422).json({
+    return res.status(statusCode.WRONG_ENTITY).json({
       error: errors.array()[0].msg,
     });
   }
@@ -187,7 +194,7 @@ const update = async (req, res) => {
         })
         .catch((err) => {
           logger.error(err);
-          res.status(400).json({
+          res.status(500).json({
             error: 'User Updation Failed!',
           });
         });
@@ -201,7 +208,6 @@ const update = async (req, res) => {
 
 const signin = async (req, res) => {
   const errors = validationResult(req);
-
   if (!errors.isEmpty()) {
     return res.status(422).json({
       error: errors.array()[0].msg,
@@ -209,7 +215,6 @@ const signin = async (req, res) => {
   }
 
   const { email, password } = req.body;
-
   try {
     await userModel.findOne({ email }, (err, user) => {
       if (err || !user) {

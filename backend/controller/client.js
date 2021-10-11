@@ -6,8 +6,8 @@ const model = require('../model/client');
 const formidable = require('formidable');
 const fs = require('fs');
 
-let log4js = require('log4js');
-let logger = log4js.getLogger();
+const log4js = require('log4js');
+const logger = log4js.getLogger();
 logger.level = 'debug';
 
 const saveData = (req, res) => {
