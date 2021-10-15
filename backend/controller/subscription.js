@@ -2,155 +2,199 @@
  * @author krish
  */
 
-const model = require('../model/subscription');
-const { validationResult } = require('express-validator');
+const subscriptionModel = require('../model/subscription')
+const { validationResult } = require('express-validator')
+const { statusCode: SC } = require('../utils/statusCode')
+const { loggerUtil: logger } = require('../utils/logger')
 
-let log4js = require('log4js');
-let logger = log4js.getLogger();
-logger.level = 'debug';
-
-const saveData = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      error: errors.array()[0].msg,
-    });
-  }
-  let email = req.body.email;
-
-  if (!email) {
-    res.json({
-      error: 'Please Include E-Mail',
-    });
-  } else {
-    let result = {
-      email,
-    };
-    let subscriptionModel = new model(result);
-    model.findOne({ email }).exec((err, data) => {
-      if (err) {
-        logger.error(err);
-      }
-
-      if (!data) {
-        subscriptionModel.save((err, data) => {
-          if (err) {
-            res.status(400).json({
-              error: 'Saving data in DB failed',
-            });
-          }
-          res.json(data);
-        });
-      } else {
-        res.json({
-          message: 'Email is Already stored in DB!',
-        });
-      }
-    });
-  }
-};
-
-const getDataById = (req, res) => {
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
+const saveSubscription = async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(SC.WRONG_ENTITY).json({
+            error: errors.array()[0].msg
+        })
     }
-    if (data) {
-      res.send(data);
+    const email = req.body.email
+
+    if (!email) {
+        res.status(SC.BAD_REQUEST).json({
+            error: 'Please include E-Mail!'
+        })
     } else {
-      res.json({
-        message: 'No Record found!',
-      });
-    }
-  });
-};
+        const subscription = new subscriptionModel({ email })
 
-const getAllData = (req, res) => {
-  model.find({}).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if (data) {
-      res.send(data);
-    } else {
-      res.json({
-        message: 'No Record found!',
-      });
-    }
-  });
-};
+        try {
+            await subscriptionModel.findOne({ email }).exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
 
-const updateDataById = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      error: errors.array()[0].msg,
-    });
-  }
-  model.findOne({ _id: req.params.id }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if(!data) {
-      res.status(404).json(({
-        'error' : 'No record found!'
-      }))
-    } else {
-      let { email, isApproved } = req.body;
-    if (data.email === email) {
-      return res.json({
-        error: 'Please enter different E-Mail address to update',
-      });
-    }
-    !email ? (email = data.email) : email;
-    isApproved === undefined ? (isApproved = data.isApproved) : isApproved;
-
-    model
-      .updateOne(
-        { _id: req.params.id },
-        {
-          $set: {
-            email: email,
-            isApproved: isApproved,
-          },
+                if (!data) {
+                    subscription.save((err, data) => {
+                        if (err) {
+                            logger(err, 'ERROR')
+                            res.status(SC.BAD_REQUEST).json({
+                                error: 'Saving data in DB failed!'
+                            })
+                        }
+                        res.status(SC.OK).json({
+                            message: 'Subscription saved successfully!',
+                            data: data
+                        })
+                    })
+                } else {
+                    res.status(SC.BAD_REQUEST).json({
+                        message: 'Email is already available in DB!'
+                    })
+                }
+            })
+        } catch (err) {
+            logger(err, 'ERROR')
+        } finally {
+            logger('Save Subscription  Function is Executed')
         }
-      )
-      .then(() => {
-        res.json({
-          message: 'User Updated Successfully!',
-        });
-      })
-      .catch((err) => {
-        logger.error(err);
-        res.json({
-          error: 'User Updation Failed!',
-        });
-      });
     }
-  });
-};
+}
 
-const deleteDataById = (req, res) => {
-  model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
+const getSubscriptionById = async (req, res) => {
+    try {
+        await subscriptionModel
+            .findOne({ _id: req.params.id })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.OK).json({
+                        message: 'Subscription Fetched successfully from DB!',
+                        data: data
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        message: 'No subscription found!'
+                    })
+                }
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get Subscription Function is Executed')
     }
-    if (data) {
-      res.json({
-        message: 'Document deleted successfully!',
-      });
-    } else {
-      res.json({
-        message: 'No Record found!',
-      });
+}
+
+const getAllSubscriptions = async (req, res) => {
+    try {
+        await subscriptionModel.find({}).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                res.status(SC.OK).json({
+                    message: 'Subscriptions Fetched successfully from DB!',
+                    data: data
+                })
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    message: 'No subscription found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get All Subscription Function is Executed')
     }
-  });
-};
+}
+
+const updateSubscriptionById = async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(SC.WRONG_ENTITY).json({
+            error: errors.array()[0].msg
+        })
+    }
+    try {
+        await subscriptionModel
+            .findOne({ _id: req.params.id })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (!data) {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No subscription found!'
+                    })
+                } else {
+                    let { email, isApproved } = req.body
+                    if (data.email === email) {
+                        return res.status(SC.BAD_REQUEST).json({
+                            error: 'Please enter different E-Mail address to update~'
+                        })
+                    }
+                    !email ? (email = data.email) : email
+                    isApproved === undefined
+                        ? (isApproved = data.isApproved)
+                        : isApproved
+
+                    subscriptionModel
+                        .updateOne(
+                            { _id: req.params.id },
+                            {
+                                $set: {
+                                    email: email,
+                                    isApproved: isApproved
+                                }
+                            }
+                        )
+                        .then(() => {
+                            res.status(SC.OK).json({
+                                message: 'User Updated Successfully!'
+                            })
+                        })
+                        .catch((err) => {
+                            logger(err, 'ERROR')
+                            res.status(SC.BAD_REQUEST).json({
+                                error: 'User Updation Failed!'
+                            })
+                        })
+                }
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Update Subscription Function is Executed')
+    }
+}
+
+const deleteSubscriptionById = async (req, res) => {
+    try {
+        await subscriptionModel
+            .findByIdAndDelete({ _id: req.params.id })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.OK).json({
+                        message: 'Subscription document deleted successfully!'
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        message: 'No subscription found!'
+                    })
+                }
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Delete Subscription Function is Executed')
+    }
+}
 
 module.exports = {
-  saveData,
-  getDataById,
-  getAllData,
-  updateDataById,
-  deleteDataById,
-};
+    saveSubscription,
+    getSubscriptionById,
+    getAllSubscriptions,
+    updateSubscriptionById,
+    deleteSubscriptionById
+}

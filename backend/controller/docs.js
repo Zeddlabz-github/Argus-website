@@ -2,243 +2,289 @@
  * @author krish
  */
 
-const model = require('../model/docs');
-const formidable = require('formidable');
-const fs = require('fs');
-const _ = require('lodash');
-
-let log4js = require('log4js');
-let logger = log4js.getLogger();
-logger.level = 'debug';
+const docModel = require('../model/docs')
+const formidable = require('formidable')
+const fs = require('fs')
+const _ = require('lodash')
+const { statusCode: SC } = require('../utils/statusCode')
+const { loggerUtil: logger } = require('../utils/logger')
 
 const getObjSize = (obj) => {
-  let size = 0,
-    key;
-  for (key in obj) {
-    if (obj.hasOwnProperty(key)) size++;
-  }
-  return size;
-};
-
-const uploadData = (req, res) => {
-  const userId = req.auth._id;
-  let form = new formidable.IncomingForm();
-  form.keepExtensions = true;
-  form.parse(req, (err, fields, file) => {
-    if (err) {
-      return res.status(400).json({
-        error: 'problem with image',
-      });
+    let size = 0,
+        key
+    for (key in obj) {
+        // eslint-disable-next-line no-prototype-builtins
+        if (obj.hasOwnProperty(key)) size++
     }
-    model.findOne({ userId }).exec((err, data) => {
-      if (err) {
-        logger.error(err);
-      }
-      if (data) {
-        res.status(400).json({
-          error: 'Document is already available for this user',
-        });
-      } else {
-        if (getObjSize(file)) {
-          let savedDoc = 0;
-          const newModel = new model();
-          newModel.userId = userId;
-          _.forIn(file, (value, key) => {
-            if (value.size > 3000000) {
-              logger.info(`File size is too big for ${doc}`);
-            } else {
-              savedDoc++;
-              newModel[key].name = value.name;
-              newModel[key].data = fs.readFileSync(value.path);
-              newModel[key].contentType = value.type;
-            }
-          });
-          newModel.save((err, data) => {
+    return size
+}
+
+const uploadDocs = async (req, res) => {
+    const userId = req.auth._id
+    const form = new formidable.IncomingForm()
+    form.keepExtensions = true
+
+    try {
+        await form.parse(req, (err, fields, file) => {
             if (err) {
-              logger.error(err);
+                logger(err, 'ERROR')
+                return res.status(SC.BAD_REQUEST).json({
+                    error: 'Problem with document'
+                })
             }
-            res.status(200).json({
-              message: `${savedDoc} Document saved successfully!`,
-            });
-          });
-        } else {
-          res.status(404).json({
-            message: 'File Not Found',
-          });
-        }
-      }
-    });
-  });
-};
-
-const updateData = (req, res) => {
-  const userId = req.auth._id;
-  let form = new formidable.IncomingForm();
-  form.keepExtensions = true;
-  form.parse(req, (err, fields, file) => {
-    if (err) {
-      return res.status(400).json({
-        error: 'problem with image',
-      });
+            docModel.findOne({ userId }).exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.BAD_REQUEST).json({
+                        error: 'Document is already available for this user!'
+                    })
+                } else {
+                    if (getObjSize(file)) {
+                        let savedDoc = 0
+                        const docs = new docModel()
+                        docs.userId = userId
+                        _.forIn(file, (value, key) => {
+                            if (value.size > 3000000) {
+                                logger(`File size is too big for ${value.name}`)
+                            } else {
+                                savedDoc++
+                                docs[key].name = value.name
+                                docs[key].data = fs.readFileSync(value.path)
+                                docs[key].contentType = value.type
+                            }
+                        })
+                        docs.save((err) => {
+                            if (err) {
+                                logger(err, 'ERROR')
+                                return res.status(SC.BAD_REQUEST).json({
+                                    error: 'Saving data in DB failed!'
+                                })
+                            }
+                            res.status(SC.OK).json({
+                                message: `${savedDoc} Document saved successfully!`
+                            })
+                        })
+                    } else {
+                        res.status(SC.NOT_FOUND).json({
+                            error: 'Document not found!'
+                        })
+                    }
+                }
+            })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Upload Docs Function is Executed')
     }
-    model.findOne({ userId }).exec((err, data) => {
-      if (err) {
-        logger.error(err);
-      }
-      if (data) {
-        let fileName, fileData, fileType;
-        if (getObjSize(file)) {
-          let savedDoc = 0;
-          _.forIn(file, (value, key) => {
-            if (value.size > 3000000) {
-              logger.info(`File size is too big for ${doc}`);
+}
+
+const updateDocs = async (req, res) => {
+    const userId = req.auth._id
+    const form = new formidable.IncomingForm()
+    form.keepExtensions = true
+
+    try {
+        await form.parse(req, (err, fields, file) => {
+            if (err) {
+                return res.status(SC.BAD_REQUEST).json({
+                    error: 'Problem with the document!'
+                })
+            }
+            docModel.findOne({ userId }).exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    let fileName, fileData, fileType
+                    if (getObjSize(file)) {
+                        let savedDoc = 0
+                        _.forIn(file, (value, key) => {
+                            if (value.size > 3000000) {
+                                logger(`File size is too big for ${value.name}`)
+                            } else {
+                                fileName = value.name
+                                fileData = fs.readFileSync(value.path)
+                                fileType = value.type
+                                savedDoc++
+                                docModel
+                                    .updateOne(
+                                        { userId },
+                                        {
+                                            $set: {
+                                                [key]: {
+                                                    name: fileName,
+                                                    data: fileData,
+                                                    contentType: fileType
+                                                }
+                                            }
+                                        }
+                                    )
+                                    .then(() => null)
+                            }
+                        })
+                        res.status(SC.OK).json({
+                            message: `${savedDoc} documents updated succesfully!`
+                        })
+                    } else {
+                        res.status(SC.NOT_FOUND).json({
+                            error: 'Document not found!'
+                        })
+                    }
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No documents found for this user!'
+                    })
+                }
+            })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Update Docs Function is Executed!')
+    }
+}
+
+const getUserDocs = async (req, res) => {
+    const userId = req.auth._id
+    try {
+        await docModel.findOne({ userId }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                _.forIn(data, (value, key) => {
+                    if (key.includes('doc')) {
+                        data[`${key}`].data = undefined
+                    }
+                })
+                res.status(SC.OK).json({
+                    message: 'User document details fetched successfully!',
+                    data: data
+                })
             } else {
-              fileName = value.name;
-              fileData = fs.readFileSync(value.path);
-              fileType = value.type;
-              savedDoc++;
-              model
-                .updateOne(
-                  { userId },
-                  {
-                    $set: {
-                      [key]: {
-                        name: fileName,
-                        data: fileData,
-                        contentType: fileType,
-                      },
-                    },
-                  }
-                )
-                .then(() => null);
+                res.status(SC.NOT_FOUND).json({
+                    error: 'No document found!'
+                })
             }
-          });
-          res.status(200).json({
-            message: `${savedDoc} documents updated succesfully!`,
-          });
-        } else {
-          res.status(404).json({
-            message: 'File Not Found',
-          });
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get User Docs Function is Executed!')
+    }
+}
+
+const getDocFile = async (req, res) => {
+    const userId = req.auth._id
+    const doc = req.params.id
+    try {
+        await docModel.findOne({ userId }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                if (data[`${doc}`].data !== null) {
+                    res.set('Content-Type', data[`${doc}`].contentType)
+                    res.status(SC.OK).send(data[`${doc}`].data)
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'Doc Not Found!'
+                    })
+                }
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    error: 'No document found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get Doc File Function is Executed!')
+    }
+}
+
+const deleteDocById = async (req, res) => {
+    try {
+        await docModel
+            .findByIdAndDelete({ _id: req.params.id })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.OK).json({
+                        message: 'Document deleted successfully!'
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No document found!'
+                    })
+                }
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Delete Document Function is Executed!')
+    }
+}
+
+const deleteDocs = async (req, res) => {
+    const userId = req.auth._id
+    const docs = req.body.docs
+
+    if (docs?.length) {
+        try {
+            await docModel.findOne({ userId }).exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    docs.forEach((key) => {
+                        docModel
+                            .updateOne(
+                                { userId },
+                                {
+                                    $set: {
+                                        [key]: {
+                                            name: null,
+                                            data: null,
+                                            contentType: null
+                                        }
+                                    }
+                                }
+                            )
+                            .then(() => null)
+                    })
+                    res.status(SC.OK).json({
+                        message: `${docs.length} document deleted succesfully!`
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No Document found!'
+                    })
+                }
+            })
+        } catch (err) {
+            logger(err, 'ERROR')
+        } finally {
+            logger('Delete Docs Function is Executed!')
         }
-      } else {
-        res.status(404).json({
-          error: 'No Documents found for this user!',
-        });
-      }
-    });
-  });
-};
-
-const getData = (req, res) => {
-  const userId = req.auth._id;
-  model.findOne({ userId }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if (data) {
-      _.forIn(data, (value, key) => {
-        if (key.includes('doc')) {
-          data[`${key}`].data = undefined;
-        }
-      });
-      res.send(data);
     } else {
-      res.json({
-        message: 'No Record found!',
-      });
+        res.status(SC.BAD_REQUEST).json({
+            error: 'Give atleast 1 doc in an array with docs as a key!'
+        })
     }
-  });
-};
-
-const getDoc = (req, res) => {
-  const userId = req.auth._id;
-  const doc = req.params.id;
-  model.findOne({ userId }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if (data) {
-      if (data[`${doc}`].data !== null) {
-        res.set('Content-Type', data[`${doc}`].contentType);
-        res.send(data[`${doc}`].data);
-      } else {
-        res.status(404).json({
-          message: 'Doc Not Found!',
-        });
-      }
-    } else {
-      res.json({
-        message: 'No Record found!',
-      });
-    }
-  });
-};
-
-const deleteDataById = (req, res) => {
-  model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
-    if (err) {
-      logger.error(err);
-    }
-    if (data) {
-      res.json({
-        message: 'Document deleted successfully!',
-      });
-    } else {
-      res.json({
-        message: 'No Record found!',
-      });
-    }
-  });
-};
-
-const deleteDocs = (req, res) => {
-  const userId = req.auth._id;
-  const docs = req.body.docs;
-
-  if (docs?.length) {
-    model.findOne({ userId }).exec((err, data) => {
-      if (err) {
-        logger.error(err);
-      }
-      if (data) {
-        docs.forEach((key) => {
-          model
-            .updateOne(
-              { userId },
-              {
-                $set: {
-                  [key]: {
-                    name: null,
-                    data: null,
-                    contentType: null,
-                  },
-                },
-              }
-            )
-            .then(() => null);
-        });
-        res.status(200).json({
-          message: `${docs.length} document deleted succesfully!`,
-        });
-      } else {
-        res.json({
-          message: 'No Record found!',
-        });
-      }
-    });
-  } else {
-    res.json({
-      error: 'Give atleast 1 doc in an array with docs as a key!',
-    });
-  }
-};
+}
 
 module.exports = {
-  uploadData,
-  updateData,
-  getData,
-  getDoc,
-  deleteDataById,
-  deleteDocs,
-};
+    uploadDocs,
+    updateDocs,
+    getUserDocs,
+    getDocFile,
+    deleteDocById,
+    deleteDocs
+}

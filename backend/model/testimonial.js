@@ -2,42 +2,42 @@
  * @author krish
  */
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      maxlength: 30,
-      trim: true,
-      required: true,
+const testimonialSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            maxlength: 30,
+            trim: true,
+            required: true
+        },
+        role: {
+            type: String,
+            maxlength: 30,
+            trim: true,
+            required: true
+        },
+        description: {
+            type: String,
+            maxlength: 100,
+            trim: true,
+            required: true
+        },
+        photo: {
+            data: Buffer,
+            contentType: String
+        },
+        isApproved: {
+            type: Boolean,
+            default: false
+        },
+        priority: {
+            type: Number,
+            default: 0
+        }
     },
-    role: {
-      type: String,
-      maxlength: 30,
-      trim: true,
-      required: true,
-    },
-    description: {
-      type: String,
-      maxlength: 100,
-      trim: true,
-      required: true,
-    },
-    photo: {
-      data: Buffer,
-      contentType: String,
-    },
-    isApproved: {
-      type: Boolean,
-      default: false,
-    },
-    priority: {
-      type: Number,
-      default: 0,
-    },
-  },
-  { timestamps: true }
-);
+    { timestamps: true }
+)
 
-module.exports = mongoose.model("testimonial", schema, "testimonial");
+module.exports = mongoose.model('testimonial', testimonialSchema, 'testimonial')
