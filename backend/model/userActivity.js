@@ -5,7 +5,7 @@
 const mongoose = require('mongoose')
 const mongoosePaginate = require('mongoose-paginate-v2')
 
-let schema = new mongoose.Schema(
+const userActivitySchema = new mongoose.Schema(
     {
         userId: mongoose.Schema.ObjectId,
         userName: {
@@ -22,5 +22,9 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-schema.plugin(mongoosePaginate)
-module.exports = mongoose.model('userActivity', schema, 'userActivity')
+userActivitySchema.plugin(mongoosePaginate)
+module.exports = mongoose.model(
+    'userActivity',
+    userActivitySchema,
+    'userActivity'
+)

@@ -5,32 +5,36 @@
 const express = require('express')
 const router = express.Router()
 const {
-    saveData,
-    getAllData,
-    getDataById,
-    updateDataById,
-    deleteDataById,
-    getPhoto
+    saveTeam,
+    getTeamById,
+    getAllTeams,
+    getTeamPhoto,
+    updateTeamById,
+    deleteTeamById
 } = require('../controller/team')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
 
-router.post('/team/create', isSignedIn, isValidToken, isAdmin, saveData)
-router.get('/team/get/:id', getDataById)
-router.get('/team/get-all', getAllData)
+router.post('/team/create', isSignedIn, isValidToken, isAdmin, saveTeam)
+router.get('/team/get/:id', getTeamById)
+router.get('/team/get-all', getAllTeams)
+router.get('/team/get-photo/:id', getTeamPhoto)
 router.put(
     '/team/update/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    updateDataById
+    updateTeamById
 )
-router.get('/team/get-photo/:id', getPhoto)
 router.delete(
     '/team/delete/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    deleteDataById
+    deleteTeamById
 )
 
 module.exports = router

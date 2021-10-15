@@ -15,7 +15,11 @@ const {
     deleteAllEvents,
     deleteAllUserEvents
 } = require('../controller/calenderEvent')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
 
 router.post(
     '/calender-event/create',

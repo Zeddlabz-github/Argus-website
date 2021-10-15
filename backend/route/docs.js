@@ -5,27 +5,30 @@
 const express = require('express')
 const router = express.Router()
 const {
-    uploadData,
-    updateData,
-    getData,
-    getDoc,
-    deleteDataById,
+    uploadDocs,
+    getUserDocs,
+    getDocFile,
+    updateDocs,
+    deleteDocById,
     deleteDocs
 } = require('../controller/docs')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
 
-router.post('/docs/upload', isSignedIn, isValidToken, uploadData)
-router.put('/docs/update', isSignedIn, isValidToken, updateData)
-router.get('/docs/get', isSignedIn, isValidToken, getData)
-router.get('/docs/get-doc/:id', isSignedIn, isValidToken, getDoc)
+router.post('/docs/upload', isSignedIn, isValidToken, uploadDocs)
+router.get('/docs/get', isSignedIn, isValidToken, getUserDocs)
+router.get('/docs/get-doc/:id', isSignedIn, isValidToken, getDocFile)
+router.put('/docs/update', isSignedIn, isValidToken, updateDocs)
 router.delete(
     '/docs/delete/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    deleteDataById
+    deleteDocById
 )
-
 router.delete(
     '/docs/delete-docs',
     isSignedIn,

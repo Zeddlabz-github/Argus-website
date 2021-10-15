@@ -10,17 +10,16 @@ const {
     signin,
     update,
     signout,
-    isSignedIn,
-    isValidToken,
-    isAdmin,
     googleLogin,
     facebookLogin
 } = require('../controller/auth')
 
+const { isSignedIn, isValidToken } = require('../controller/middleware')
+
 router.post(
     '/signup',
     [
-        check('email').isEmail().withMessage('Please Provide a valid E-Mail !'),
+        check('email').isEmail().withMessage('Please provide a valid E-Mail!'),
         check('password')
             .isLength({ min: 6 })
             .withMessage('Password length should be minimum of 8 characters')
@@ -31,7 +30,7 @@ router.post(
 router.post(
     '/signin',
     [
-        check('email').isEmail().withMessage('Please Provide a valid E-Mail !'),
+        check('email').isEmail().withMessage('Please provide a valid E-Mail!'),
         check('password')
             .isLength({ min: 1 })
             .withMessage('Password field is required')
@@ -48,7 +47,6 @@ router.put(
     [check('id').isUUID().withMessage('Please Provide id')],
     isSignedIn,
     isValidToken,
-    isAdmin,
     update
 )
 

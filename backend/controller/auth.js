@@ -4,45 +4,38 @@
 
 const userModel = require('../model/user.js')
 const jwt = require('jsonwebtoken')
-const { validationResult } = require('express-validator')
-const expressJwt = require('express-jwt')
-
+const { validationResult: validate } = require('express-validator')
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args))
-const { OAuth2Client } = require('google-auth-library')
-
-const log4js = require('log4js')
-const logger = log4js.getLogger()
-logger.level = 'debug'
-
-const { statusCode } = require('../utils/statusCode')
+const { OAuth2Client: OAuth } = require('google-auth-library')
+const { statusCode: SC } = require('../utils/statusCode')
+const { loggerUtil: logger } = require('../utils/logger')
 
 const signup = async (req, res) => {
-    const errors = validationResult(req)
+    const errors = validate(req)
     if (!errors.isEmpty()) {
-        return res.status(statusCode.WRONG_ENTITY).json({
+        return res.status(SC.WRONG_ENTITY).json({
             error: errors.array()[0].msg
         })
     }
     const { email } = req.body
-
     try {
         await userModel.findOne({ email }, (err, user) => {
             if (err || user) {
-                return res.status(400).json({
-                    error: 'E-Mail already has been registered',
-                    suggestion: 'Try some other E-mail'
+                return res.status(SC.WRONG_ENTITY).json({
+                    error: 'E-Mail already has been registered!',
+                    suggestion: 'Try using some other E-mail.'
                 })
             } else {
                 const user = new userModel(req.body)
                 user.save((err, user) => {
                     if (err) {
-                        return res.status(400).json({
-                            err: 'Failed to add user in DB'
+                        return res.status(SC.BAD_REQUEST).json({
+                            error: 'Failed to add user in DB!'
                         })
                     }
-                    res.status(200).json({
-                        message: 'User Signed Up Successfully!',
+                    res.status(SC.OK).json({
+                        message: 'User Signed Up, Successfully!',
                         data: {
                             id: user._id,
                             email: user.email,
@@ -53,9 +46,9 @@ const signup = async (req, res) => {
             }
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info(`User Signed Up with an Email - ${email}`)
+        logger(`User Signed Up Sucessfully using Email - ${email}`)
     }
 }
 
@@ -105,7 +98,7 @@ const update = async (req, res) => {
     try {
         await userModel.findOne({ _id: id }).exec((err, data) => {
             if (err || !data) {
-                return res.status(404).json({
+                return res.status(SC.NOT_FOUND).json({
                     error: 'User Not Found!'
                 })
             }
@@ -186,28 +179,28 @@ const update = async (req, res) => {
                     }
                 )
                 .then(() => {
-                    res.status(200).json({
+                    res.status(SC.OK).json({
                         message: 'User Updated Successfully!'
                     })
                 })
                 .catch((err) => {
-                    logger.error(err)
-                    res.status(500).json({
+                    res.status(SC.INTERNAL_SERVER_ERROR).json({
                         error: 'User Updation Failed!'
                     })
+                    logger(err, 'ERROR')
                 })
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('User Updation Function is Executed')
+        logger('User Update Function is Executed')
     }
 }
 
 const signin = async (req, res) => {
-    const errors = validationResult(req)
+    const errors = validate(req)
     if (!errors.isEmpty()) {
-        return res.status(422).json({
+        return res.status(SC.WRONG_ENTITY).json({
             error: errors.array()[0].msg
         })
     }
@@ -216,13 +209,13 @@ const signin = async (req, res) => {
     try {
         await userModel.findOne({ email }, (err, user) => {
             if (err || !user) {
-                return res.status(404).json({
+                return res.status(SC.NOT_FOUND).json({
                     error: "E-Mail doesn't exist in DB!"
                 })
             }
             if (!user.authenticate(password)) {
-                return res.status(401).json({
-                    error: 'E-mail and Password does not match'
+                return res.status(SC.UNAUTHORIZED).json({
+                    error: 'Oops!, E-mail and Password does not match!'
                 })
             }
 
@@ -238,31 +231,31 @@ const signin = async (req, res) => {
 
             user.salt = undefined
             user.__v = undefined
-            return res.status(200).json({
+            return res.status(SC.OK).json({
                 message: 'User Logged in Successfully!',
                 token,
                 user
             })
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info(`User Signed in - ${email}`)
+        logger(`User Signed in - ${email}`)
     }
 }
 
 const signout = (req, res) => {
     res.clearCookie('Token')
 
-    res.status(200).json({
-        message: 'User Signed Out Sucessfully'
+    res.status(SC.OK).json({
+        message: 'User Signed Out Sucessfully!'
     })
 }
 
 const googleLogin = (req, res) => {
     try {
         const { idToken } = req.body
-        const client = new OAuth2Client(process.env.GOOGLE_TOKEN)
+        const client = new OAuth(process.env.GOOGLE_TOKEN)
         client
             .verifyIdToken({
                 idToken,
@@ -274,8 +267,8 @@ const googleLogin = (req, res) => {
                 if (email_verified) {
                     userModel.findOne({ email }).exec((err, user) => {
                         if (err) {
-                            return res.status(400).json({
-                                error: 'Login failed try again'
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'Login Failed!'
                             })
                         } else if (user) {
                             const expiryTime = new Date()
@@ -293,7 +286,7 @@ const googleLogin = (req, res) => {
 
                             user.salt = undefined
                             user.__v = undefined
-                            return res.status(200).json({
+                            return res.status(SC.OK).json({
                                 message:
                                     'User Logged in Successfully from Google!',
                                 token,
@@ -309,8 +302,8 @@ const googleLogin = (req, res) => {
                             })
                             userNew.save((err, data) => {
                                 if (err) {
-                                    return res.status(400).json({
-                                        error: 'Failed to add user in DB'
+                                    return res.status(SC.BAD_REQUEST).json({
+                                        error: 'Failed to add user in DB!'
                                     })
                                 } else {
                                     const expiryTime = new Date()
@@ -332,7 +325,7 @@ const googleLogin = (req, res) => {
 
                                     data.salt = undefined
                                     data.__v = undefined
-                                    return res.status(200).json({
+                                    return res.status(SC.OK).json({
                                         message:
                                             'User Logged in Successfully from Google!',
                                         token,
@@ -345,12 +338,9 @@ const googleLogin = (req, res) => {
                 }
             })
     } catch (err) {
-        logger.error(err)
-        return res.status(400).json({
-            error: 'Login failed try again'
-        })
+        logger(err, 'ERROR')
     } finally {
-        logger.info('User Logged in from Google!')
+        logger('User Logged in from Google!')
     }
 }
 
@@ -365,8 +355,8 @@ const facebookLogin = async (req, res) => {
         if (id === userId) {
             userModel.findOne({ email }).exec((err, user) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: 'Login failed try again'
+                    return res.status(SC.BAD_REQUEST).json({
+                        error: 'Login Failed!'
                     })
                 } else if (user) {
                     const expiryTime = new Date()
@@ -382,7 +372,7 @@ const facebookLogin = async (req, res) => {
 
                     user.salt = undefined
                     user.__v = undefined
-                    return res.json({ token, user })
+                    return res.status(SC.OK).json({ token, user })
                 } else {
                     const encrypted_password = access_token + email
                     const userNew = new userModel({
@@ -393,7 +383,7 @@ const facebookLogin = async (req, res) => {
                     })
                     userNew.save((err, data) => {
                         if (err) {
-                            return res.status(400).json({
+                            return res.status(SC.BAD_REQUEST).json({
                                 error: 'Failed to add user in DB'
                             })
                         } else {
@@ -412,7 +402,7 @@ const facebookLogin = async (req, res) => {
 
                             data.salt = undefined
                             data.__v = undefined
-                            return res.status(200).json({
+                            return res.status(SC.OK).json({
                                 message:
                                     'User Logged in Successfully from Facebook!',
                                 token,
@@ -424,79 +414,9 @@ const facebookLogin = async (req, res) => {
             })
         }
     } catch (err) {
-        logger.error(err)
-        return res.status(400).json({
-            error: 'Login failed try again'
-        })
+        logger(err, 'ERROR')
     } finally {
-        logger.info('User Logged in from Facebook!')
-    }
-}
-
-const isSignedIn = expressJwt({
-    secret: process.env.SECRET,
-    algorithms: ['HS256', 'RS256'],
-    userProperty: 'auth'
-})
-
-//middlewares
-const isValidToken = (err, req, res, next) => {
-    if (err.name === 'UnauthorizedError') {
-        return res.status(401).json({ error: 'Authentication Failed' })
-    }
-    next()
-}
-
-const isAuthenticated = (req, res, next) => {
-    const checker = req.profile && req.auth && req.profile._id == req.auth._id
-
-    if (!checker) {
-        return res.status(403).json({
-            error: 'ACCESS DENIED'
-        })
-    }
-    next()
-}
-
-const isEmployee = (req, res, next) => {
-    const authId = req.auth._id
-
-    if (authId) {
-        userModel.findById(authId).exec((err, user) => {
-            if (err || !user) {
-                return res.status(404).json({
-                    error: 'No user was found in DB'
-                })
-            }
-            if (user.role === 2) {
-                next()
-            } else {
-                return res.status(401).json({
-                    error: 'Not an Employee!'
-                })
-            }
-        })
-    }
-}
-
-const isAdmin = (req, res, next) => {
-    const authId = req.auth._id
-
-    if (authId) {
-        userModel.findById(authId).exec((err, user) => {
-            if (err || !user) {
-                return res.status(404).json({
-                    error: 'No user was found in DB'
-                })
-            }
-            if (user.role === 2 || user.role === 3) {
-                next()
-            } else {
-                return res.status(401).json({
-                    error: 'Not an admin'
-                })
-            }
-        })
+        logger('User Logged in from Facebook!')
     }
 }
 
@@ -505,11 +425,6 @@ module.exports = {
     signin,
     update,
     signout,
-    isSignedIn,
-    isValidToken,
-    isAuthenticated,
-    isAdmin,
-    isEmployee,
     googleLogin,
     facebookLogin
 }

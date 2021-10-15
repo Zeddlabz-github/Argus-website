@@ -7,7 +7,7 @@ const {
     isAuthenticated,
     isAdmin,
     isValidToken
-} = require('../controller/auth')
+} = require('../controller/middleware')
 
 router.param('userId', getUserById)
 router.get('/user/get/:userId', isSignedIn, isAuthenticated, getUser)

@@ -12,7 +12,11 @@ const {
     deleteActivityById,
     deleteAllActivitiesByUserId
 } = require('../controller/userActivity')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
 
 router.post(
     '/user-activity/create/:userId',

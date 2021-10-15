@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
+const subscriptionSchema = new mongoose.Schema(
     {
         email: String,
         isApproved: {
@@ -15,4 +15,8 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model('subscription', schema, 'subscription')
+module.exports = mongoose.model(
+    'subscription',
+    subscriptionSchema,
+    'subscription'
+)

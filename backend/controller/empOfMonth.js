@@ -2,323 +2,411 @@
  * @author krish
  */
 
-const model = require('../model/empOfMonth')
+const eomModel = require('../model/empOfMonth')
 const formidable = require('formidable')
 const fs = require('fs')
 const _ = require('lodash')
-
-const log4js = require('log4js')
-const logger = log4js.getLogger()
-logger.level = 'debug'
+const { statusCode: SC } = require('../utils/statusCode')
+const { loggerUtil: logger } = require('../utils/logger')
 
 const month = new Date().getMonth() + 1
 const year = new Date().getFullYear()
 
-const saveData = (req, res) => {
-    let form = new formidable.IncomingForm()
+const saveEOM = async (req, res) => {
+    const form = new formidable.IncomingForm()
     form.keepExtensions = true
 
-    model.findOne({ month: month, year: year }).exec((err, data) => {
-        if (err) {
-            logger.error(err)
-        }
-        if (data) {
-            res.json({
-                error: 'Employee of this month is already available on the database, Kindly delete it to create a new one'
-            })
-        } else {
-            form.parse(req, (err, fields, file) => {
+    try {
+        await eomModel
+            .findOne({ month: month, year: year })
+            .exec((err, data) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: 'problem with image'
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.BAD_REQUEST).json({
+                        error: 'Employee of this month is already available on the database, Kindly delete it to create a new one'
+                    })
+                } else {
+                    form.parse(req, (err, fields, file) => {
+                        if (err) {
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'Problem with EOM image!'
+                            })
+                        }
+
+                        const eom = new eomModel(fields)
+                        eom.month = month
+                        eom.year = year
+
+                        _.forIn(file, (value, key) => {
+                            if (value.size > 3000000) {
+                                return res.status(SC.BAD_REQUEST).json({
+                                    error: 'File size is too big!'
+                                })
+                            }
+                            eom[`${key}`].name = value.name
+                            eom[`${key}`].data = fs.readFileSync(value.path)
+                            eom[`${key}`].contentType = value.type
+                        })
+
+                        eom.save((err, data) => {
+                            if (err) {
+                                res.status(SC.BAD_REQUEST).json({
+                                    error: 'Saving data in DB failed'
+                                })
+                            }
+                            data.empImage = undefined
+                            data.instructorSign = undefined
+                            data.instructorImage = undefined
+                            res.status(SC.OK).json({
+                                message:
+                                    'Employee of the month saved successfully!',
+                                data: data
+                            })
+                        })
                     })
                 }
-
-                let empModel = new model(fields)
-                empModel.month = month
-                empModel.year = year
-
-                _.forIn(file, (value, key) => {
-                    if (value.size > 3000000) {
-                        return res.status(400).json({
-                            error: 'File size too big!'
-                        })
-                    }
-                    empModel[`${key}`].name = value.name
-                    empModel[`${key}`].data = fs.readFileSync(value.path)
-                    empModel[`${key}`].contentType = value.type
-                })
-
-                empModel.save((err, data) => {
-                    if (err) {
-                        res.status(400).json({
-                            error: 'Saving data in DB failed'
-                        })
-                    }
-                    data.empImage = undefined
-                    data.instructorSign = undefined
-                    data.instructorImage = undefined
-                    res.json(data)
-                })
             })
-        }
-    })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Save EOM Function is Executed')
+    }
 }
 
-const getData = (req, res) => {
-    model.findOne({ month }).exec((err, data) => {
-        if (err) {
-            logger.error(err)
-        }
-        if (data) {
-            data.empImage = undefined
-            data.instructorImage = undefined
-            data.instructorSign = undefined
-            res.send(data)
-        } else {
-            res.json({
-                message: 'No Record found!'
-            })
-        }
-    })
-}
-
-const getDataById = (req, res) => {
-    model.findOne({ _id: req.params.id }).exec((err, data) => {
-        if (err) {
-            logger.error(err)
-        }
-        if (data) {
-            data.empImage = undefined
-            data.instructorImage = undefined
-            data.instructorSign = undefined
-            res.send(data)
-        } else {
-            res.json({
-                message: 'No Record found!'
-            })
-        }
-    })
-}
-
-const getPhoto = (req, res) => {
-    const url = req.params.id.split('-')
-    const image = url[0]
-    const id = url[1]
-    model.findOne({ _id: id }).exec((err, data) => {
-        if (err) {
-            logger.error(err)
-        }
-        if (data) {
-            res.set('Content-Type', data[`${image}`].contentType)
-            return res.send(data[`${image}`].data)
-        } else {
-            res.json({
-                message: 'No Record found!'
-            })
-        }
-    })
-}
-
-const getDataByMonth = (req, res) => {
-    model.findOne({ month: req.params.month }).exec((err, data) => {
-        if (err) {
-            logger.error(err)
-        }
-        if (data) {
-            data.empImage = undefined
-            data.instructorImage = undefined
-            data.instructorSign = undefined
-            res.send(data)
-        } else {
-            res.json({
-                message: 'No Record found!'
-            })
-        }
-    })
-}
-
-const getAllData = (req, res) => {
-    model
-        .find({}, { empImage: 0, instructorImage: 0, instructorSign: 0 })
-        .exec((err, data) => {
+const getEOM = async (req, res) => {
+    try {
+        await eomModel.findOne({ month }).exec((err, data) => {
             if (err) {
-                logger.error(err)
+                logger(err, 'ERROR')
             }
             if (data) {
-                data?.forEach((data) => {
-                    data.empImage = undefined
-                    data.instructorImage = undefined
-                    data.instructorSign = undefined
+                data.empImage = undefined
+                data.instructorImage = undefined
+                data.instructorSign = undefined
+
+                res.status(SC.OK).json({
+                    message: 'Employee of the month fetched successfully!',
+                    data: data
                 })
-                res.send(data)
             } else {
-                res.json({
-                    message: 'No Record found!'
+                res.status(SC.NOT_FOUND).json({
+                    message: 'No EOM document is found!'
                 })
             }
         })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get EOM By User Function is Executed')
+    }
 }
 
-const updateDataById = (req, res) => {
-    let form = new formidable.IncomingForm()
-    form.keepExtensions = true
-    model.findOne({ _id: req.params.id }).exec((err, data) => {
-        if (err) {
-            logger.error(err)
-        }
-        if (!data) {
-            res.status(404).json({
-                message: 'No Record to update!'
-            })
-        } else {
-            form.parse(req, (err, fields, file) => {
+const getEOMById = async (req, res) => {
+    try {
+        await eomModel.findOne({ _id: req.params.id }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                data.empImage = undefined
+                data.instructorImage = undefined
+                data.instructorSign = undefined
+                res.status(SC.OK).json({
+                    message: 'Employee of the month fetched successfully!',
+                    data: data
+                })
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    message: 'No EOM document is found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get EOM By Id Function is Executed')
+    }
+}
+
+const getEOMByMonth = async (req, res) => {
+    try {
+        await eomModel
+            .findOne({ month: req.params.month })
+            .exec((err, data) => {
                 if (err) {
-                    return res.status(400).json({
-                        error: 'problem with image'
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    data.empImage = undefined
+                    data.instructorImage = undefined
+                    data.instructorSign = undefined
+                    res.status(SC.OK).json({
+                        message: 'Employee of the month fetched successfully!',
+                        data: data
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        message: 'No EOM document is found!'
                     })
                 }
-                let {
-                    empName,
-                    empDesc,
-                    skills,
-                    description,
-                    instructorName,
-                    instructorRole,
-                    month,
-                    year,
-                    title
-                } = fields
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get EOM By Month Function is Executed')
+    }
+}
 
-                !empName ? (empName = data?.empName) : empName
-                !empDesc ? (empDesc = data?.empDesc) : empDesc
-                !skills ? (skills = data?.skills) : skills.split(',')
-                !description ? (description = data?.description) : description
-                !instructorName
-                    ? (instructorName = data?.instructorName)
-                    : instructorName
-                !instructorRole
-                    ? (instructorRole = data?.instructorRole)
-                    : instructorRole
-                !month ? (month = data?.month) : month
-                !year ? (year = data?.year) : year
-                !title ? (title = data?.title) : title
+const getAllEMOS = async (req, res) => {
+    try {
+        await eomModel
+            .find({}, { empImage: 0, instructorImage: 0, instructorSign: 0 })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    data?.forEach((data) => {
+                        data.empImage = undefined
+                        data.instructorImage = undefined
+                        data.instructorSign = undefined
+                    })
+                    res.status(SC.OK).json({
+                        message: 'Employee of the month fetched successfully!',
+                        data: data
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        message: 'No EOM document is found!'
+                    })
+                }
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get All EOMs Function is Executed')
+    }
+}
 
-                let empData,
-                    empType,
-                    instructorData,
-                    instructorType,
-                    instructorSignData,
-                    instructorSignType
-                if (file.empImage) {
-                    if (file.empImage.size > 3000000) {
-                        return res.status(400).json({
-                            error: 'File size too big!'
+const getEOMPhoto = async (req, res) => {
+    const url = req.params.id.split('-')
+    const image = url[0]
+    const id = url[1]
+    try {
+        await eomModel.findOne({ _id: id }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                res.set('Content-Type', data[`${image}`].contentType)
+                return res.status(SC.OK).send(data[`${image}`].data)
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    message: 'No EOM photo is found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get EOM Photo Function is Executed')
+    }
+}
+
+const updateEOMById = async (req, res) => {
+    const form = new formidable.IncomingForm()
+    form.keepExtensions = true
+
+    try {
+        await eomModel.findOne({ _id: req.params.id }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (!data) {
+                res.status(SC.NOT_FOUND).json({
+                    message: 'No EOM document to update!'
+                })
+            } else {
+                form.parse(req, (err, fields, file) => {
+                    if (err) {
+                        logger(err, 'ERROR')
+
+                        return res.status(SC.BAD_REQUEST).json({
+                            error: 'Problem with EOM image!'
                         })
                     }
-                    empData = fs.readFileSync(file.empImage.path)
-                    empType = file.empImage.type
-                } else {
-                    empData = data.empImage.data
-                    empType = data.empImage.contentType
-                }
+                    let {
+                        empName,
+                        empDesc,
+                        skills,
+                        description,
+                        instructorName,
+                        instructorRole,
+                        month,
+                        year,
+                        title
+                    } = fields
 
-                if (file.instructorImage) {
-                    if (file.instructorImage.size > 3000000) {
-                        return res.status(400).json({
-                            error: 'File size too big!'
-                        })
+                    !empName ? (empName = data?.empName) : empName
+                    !empDesc ? (empDesc = data?.empDesc) : empDesc
+                    !skills ? (skills = data?.skills) : skills.split(',')
+                    !description
+                        ? (description = data?.description)
+                        : description
+                    !instructorName
+                        ? (instructorName = data?.instructorName)
+                        : instructorName
+                    !instructorRole
+                        ? (instructorRole = data?.instructorRole)
+                        : instructorRole
+                    !month ? (month = data?.month) : month
+                    !year ? (year = data?.year) : year
+                    !title ? (title = data?.title) : title
+
+                    let empFileData,
+                        empFileType,
+                        empFileName,
+                        instructorFileData,
+                        instructorFileType,
+                        instructorFileName,
+                        instructorSignFileData,
+                        instructorSignFileType,
+                        instructorSignFileName
+                    if (file.empImage) {
+                        if (file.empImage.size > 3000000) {
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'File size is too big!'
+                            })
+                        }
+                        empFileData = fs.readFileSync(file.empImage.path)
+                        empFileType = file.empImage.type
+                        empFileName = file.empImage.name
+                    } else {
+                        empFileData = data.empImage.data
+                        empFileType = data.empImage.contentType
+                        empFileName = data.empImage.name
                     }
-                    instructorData = fs.readFileSync(file.instructorImage.path)
-                    instructorType = file.instructorImage.type
-                } else {
-                    instructorData = data.instructorImage.data
-                    instructorType = data.instructorImage.contentType
-                }
 
-                if (file.instructorSign) {
-                    if (file.instructorSign.size > 3000000) {
-                        return res.status(400).json({
-                            error: 'File size too big!'
-                        })
+                    if (file.instructorImage) {
+                        if (file.instructorImage.size > 3000000) {
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'File size is too big!'
+                            })
+                        }
+                        instructorFileData = fs.readFileSync(
+                            file.instructorImage.path
+                        )
+                        instructorFileType = file.instructorImage.type
+                        instructorFileName = file.instructorImage.name
+                    } else {
+                        instructorFileData = data.instructorImage.data
+                        instructorFileType = data.instructorImage.contentType
+                        instructorFileName = data.instructorImage.name
                     }
-                    instructorSignData = fs.readFileSync(
-                        file.instructorSign.path
-                    )
-                    instructorSignType = file.instructorSign.type
-                } else {
-                    instructorSignData = data.instructorSign.data
-                    instructorSignType = data.instructorSign.contentType
-                }
 
-                model
-                    .updateOne(
-                        { _id: req.params.id },
-                        {
-                            $set: {
-                                empName: empName,
-                                empDesc: empDesc,
-                                skills: skills,
-                                title: title,
-                                description: description,
-                                instructorName: instructorName,
-                                instructorRole: instructorRole,
-                                month: month,
-                                year: year,
-                                empImage: {
-                                    data: empData,
-                                    contentType: empType
-                                },
-                                instructorImage: {
-                                    data: instructorData,
-                                    contentType: instructorType
-                                },
-                                instructorSign: {
-                                    data: instructorSignData,
-                                    contentType: instructorSignType
+                    if (file.instructorSign) {
+                        if (file.instructorSign.size > 3000000) {
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'File size is too big!'
+                            })
+                        }
+                        instructorSignFileData = fs.readFileSync(
+                            file.instructorSign.path
+                        )
+                        instructorSignFileType = file.instructorSign.type
+                        instructorSignFileName = file.instructorSign.name
+                    } else {
+                        instructorSignFileData = data.instructorSign.data
+                        instructorSignFileType = data.instructorSign.contentType
+                        instructorSignFileName = data.instructorSign.name
+                    }
+
+                    eomModel
+                        .updateOne(
+                            { _id: req.params.id },
+                            {
+                                $set: {
+                                    empName: empName,
+                                    empDesc: empDesc,
+                                    skills: skills,
+                                    title: title,
+                                    description: description,
+                                    instructorName: instructorName,
+                                    instructorRole: instructorRole,
+                                    month: month,
+                                    year: year,
+                                    empImage: {
+                                        data: empFileData,
+                                        contentType: empFileType,
+                                        name: empFileName
+                                    },
+                                    instructorImage: {
+                                        data: instructorFileData,
+                                        contentType: instructorFileType,
+                                        name: instructorFileName
+                                    },
+                                    instructorSign: {
+                                        data: instructorSignFileData,
+                                        contentType: instructorSignFileType,
+                                        name: instructorSignFileName
+                                    }
                                 }
                             }
-                        }
-                    )
-                    .then(() => {
-                        res.json({
-                            message: 'User Updated Successfully!'
+                        )
+                        .then(() => {
+                            res.status(SC.OK).json({
+                                message: 'EOM document updated successfully!'
+                            })
                         })
-                    })
-                    .catch(() => {
-                        res.json({
-                            error: 'User Updation Failed!'
+                        .catch(() => {
+                            res.status(SC.BAD_REQUEST).json({
+                                error: 'EOM document updation Failed!'
+                            })
                         })
-                    })
-            })
-        }
-    })
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Update EOM Function is Executed')
+    }
 }
 
-const deleteDataById = (req, res) => {
-    model.findByIdAndDelete({ _id: req.params.id }).exec((err, data) => {
-        if (err) {
-            logger.error(err)
-        }
-        if (data) {
-            res.json({
-                message: 'Document deleted successfully!'
+const deleteEOMById = async (req, res) => {
+    try {
+        await eomModel
+            .findByIdAndDelete({ _id: req.params.id })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.OK).json({
+                        message: 'EOM document deleted successfully!'
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        message: 'No EOM document found!'
+                    })
+                }
             })
-        } else {
-            res.json({
-                message: 'No Record found!'
-            })
-        }
-    })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Delete EOM Function is Executed')
+    }
 }
 
 module.exports = {
-    saveData,
-    getData,
-    getDataById,
-    getDataByMonth,
-    getPhoto,
-    getAllData,
-    updateDataById,
-    deleteDataById
+    saveEOM,
+    getEOM,
+    getEOMById,
+    getEOMByMonth,
+    getEOMPhoto,
+    getAllEMOS,
+    updateEOMById,
+    deleteEOMById
 }

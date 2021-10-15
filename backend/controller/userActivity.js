@@ -5,10 +5,8 @@
 const userActivityModel = require('../model/userActivity')
 const userModel = require('../model/user')
 const mongoose = require('mongoose')
-
-const log4js = require('log4js')
-const logger = log4js.getLogger()
-logger.level = 'debug'
+const { statusCode: SC } = require('../utils/statusCode')
+const { loggerUtil: logger } = require('../utils/logger')
 
 const createActivity = async (req, res) => {
     let result = {
@@ -22,7 +20,7 @@ const createActivity = async (req, res) => {
     try {
         await userModel.findOne({ _id: userId }).exec((err, data) => {
             if (err) {
-                logger.error(err)
+                logger(err, 'ERROR')
             }
             if (data) {
                 result.userId = userId
@@ -32,26 +30,26 @@ const createActivity = async (req, res) => {
                 const activityModel = new userActivityModel(result)
                 activityModel.save((err, data) => {
                     if (err) {
-                        logger.error(err)
-                        res.status(400).json({
+                        res.status(SC.BAD_REQUEST).json({
                             error: 'Creating Activity in DB is failed!'
                         })
+                        logger(err, 'ERROR')
                     }
-                    res.status(200).json({
+                    res.status(SC.OK).json({
                         message: 'User Activity created successfully!',
                         data: data
                     })
                 })
             } else {
-                res.status(404).json({
+                res.status(SC.NOT_FOUND).json({
                     error: 'No User found!'
                 })
             }
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Create Acitivity Function is Executed!')
+        logger('Create Acitivity Function is Executed!')
     }
 }
 
@@ -80,20 +78,20 @@ const getUserAvtivity = async (req, res) => {
     try {
         await userActivityModel.paginate({ userId }, options, (err, result) => {
             if (err) {
-                logger.error(err)
-                res.status(400).json({
-                    error: 'Getting User Activity from DB is failed!'
+                res.status(SC.BAD_REQUEST).json({
+                    error: 'Getting user activity from DB is failed!'
                 })
+                logger(err, 'ERROR')
             }
-            res.status(200).send({
-                message: 'User Activity is Fetched Successfully',
+            res.status(SC.OK).send({
+                message: 'User activity is fetched successfully',
                 data: result
             })
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get User Acitivity Function is Executed!')
+        logger('Get User Acitivity Function is Executed!')
     }
 }
 
@@ -105,8 +103,8 @@ const getOtherUserActivity = async (req, res) => {
     }
     let userId
     if (req.query.userId === undefined) {
-        res.status(400).json({
-            error: 'Please Pass userId as a Query parameter'
+        res.status(SC.BAD_REQUEST).json({
+            error: 'Please pass userId as a query parameter'
         })
     } else {
         userId = req.query.userId
@@ -117,20 +115,20 @@ const getOtherUserActivity = async (req, res) => {
     try {
         userActivityModel.paginate({ userId }, options, (err, result) => {
             if (err) {
-                logger.error(err)
-                res.status(400).json({
-                    error: 'Getting User Activity from DB is failed!'
+                res.status(SC.BAD_REQUEST).json({
+                    error: 'Getting user activity from DB is failed!'
                 })
+                logger(err, 'ERROR')
             }
-            res.status(200).send({
-                message: 'User Activity is Fetched Successfully',
+            res.status(SC.OK).send({
+                message: 'User activity is fetched successfully',
                 data: result
             })
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get Other User Activity Function is Executed!')
+        logger('Get Other User Activity Function is Executed!')
     }
 }
 
@@ -207,19 +205,19 @@ const getAllUserActivities = async (req, res) => {
         }
 
         if (result.length) {
-            res.status(200).send({
-                message: 'All User Activities Fetched Successfully',
+            res.status(SC.OK).send({
+                message: 'All user activities fetched successfully',
                 data: result
             })
         } else {
-            res.status(404).json({
-                error: 'No Activites found!'
+            res.status(SC.NOT_FOUND).json({
+                error: 'No activites found!'
             })
         }
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get All User Activities Function is Executed!')
+        logger('Get All User Activities Function is Executed!')
     }
 }
 
@@ -229,25 +227,25 @@ const deleteActivityById = async (req, res) => {
             .findByIdAndDelete({ _id: req.params.id })
             .exec((err, data) => {
                 if (err) {
-                    logger.error(err)
-                    res.status(400).json({
-                        error: 'Deleting User Activity from DB is failed!'
+                    res.status(SC.BAD_REQUEST).json({
+                        error: 'Deleting user activity from DB is failed!'
                     })
+                    logger(err, 'ERROR')
                 }
                 if (data) {
-                    res.status(200).json({
+                    res.status(SC.OK).json({
                         message: 'Activity deleted successfully!'
                     })
                 } else {
-                    res.status(404).json({
-                        error: 'No Activities found!'
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No activities found!'
                     })
                 }
             })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Delete User Activity Function is Executed!')
+        logger('Delete User Activity Function is Executed!')
     }
 }
 
@@ -257,25 +255,25 @@ const deleteAllActivitiesByUserId = async (req, res) => {
             .deleteMany({ userId: req.params.userId })
             .exec((err, data) => {
                 if (err) {
-                    logger.error(err)
-                    res.status(400).json({
-                        error: 'Getting All User Activities from DB is failed!'
+                    res.status(SC.BAD_REQUEST).json({
+                        error: 'Getting all user activities from DB is failed!'
                     })
+                    logger(err, 'ERROR')
                 }
                 if (data) {
-                    res.status(200).json({
+                    res.status(SC.OK).json({
                         message: 'User activites deleted successfully!'
                     })
                 } else {
-                    res.status(404).json({
-                        error: 'No Activities found!'
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No activities found!'
                     })
                 }
             })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Delete All User Activities Function is Executed!')
+        logger('Delete All User Activities Function is Executed!')
     }
 }
 

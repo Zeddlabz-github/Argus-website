@@ -6,47 +6,53 @@ const express = require('express')
 const router = express.Router()
 const { check } = require('express-validator')
 const {
-    saveData,
-    getAllData,
-    getDataById,
-    updateDataById,
-    deleteDataById
+    saveSubscription,
+    getSubscriptionById,
+    getAllSubscriptions,
+    updateSubscriptionById,
+    deleteSubscriptionById
 } = require('../controller/subscription')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
 
 router.post(
     '/subscription/save',
     check('email').isEmail().withMessage('Please Provide a valid E-Mail !'),
-    saveData
+    saveSubscription
+)
+
+router.get(
+    '/subscription/get/:id',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    getSubscriptionById
 )
 router.get(
     '/subscription/get-all',
     isSignedIn,
     isValidToken,
     isAdmin,
-    getAllData
+    getAllSubscriptions
 )
-router.get(
-    '/subscription/get/:id',
-    isSignedIn,
-    isValidToken,
-    isAdmin,
-    getDataById
-)
+
 router.put(
     '/subscription/update/:id',
     check('email').isEmail().withMessage('Please Provide a valid E-Mail !'),
     isSignedIn,
     isValidToken,
     isAdmin,
-    updateDataById
+    updateSubscriptionById
 )
 router.delete(
     '/subscription/delete/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    deleteDataById
+    deleteSubscriptionById
 )
 
 module.exports = router

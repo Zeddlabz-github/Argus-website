@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
+const eomSchema = new mongoose.Schema(
     {
         empName: String,
         empDesc: String,
@@ -67,4 +67,4 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model('empOfMonth', schema, 'empOfMonth')
+module.exports = mongoose.model('empOfMonth', eomSchema, 'empOfMonth')

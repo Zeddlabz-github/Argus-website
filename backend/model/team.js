@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
+const teamSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -31,4 +31,4 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model('team', schema, 'team')
+module.exports = mongoose.model('team', teamSchema, 'team')

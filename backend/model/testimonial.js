@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
+const testimonialSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -40,4 +40,4 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model('testimonial', schema, 'testimonial')
+module.exports = mongoose.model('testimonial', testimonialSchema, 'testimonial')

@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
+const contactSchema = new mongoose.Schema(
     {
         phoneNumber: String,
         address: String,
@@ -14,4 +14,4 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model('contact', schema, 'contact')
+module.exports = mongoose.model('contact', contactSchema, 'contact')

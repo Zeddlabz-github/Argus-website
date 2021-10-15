@@ -4,10 +4,8 @@
 
 const calenderEventModel = require('../model/calenderEvent')
 const mongoose = require('mongoose')
-
-const log4js = require('log4js')
-const logger = log4js.getLogger()
-logger.level = 'debug'
+const { statusCode: SC } = require('../utils/statusCode')
+const { loggerUtil: logger } = require('../utils/logger')
 
 const addEvent = async (req, res) => {
     let result = {
@@ -27,20 +25,20 @@ const addEvent = async (req, res) => {
         const calenderEvent = new calenderEventModel(result)
         calenderEvent.save((err, data) => {
             if (err) {
-                logger.error(err)
-                res.status(400).json({
-                    error: 'Saving data in DB failed'
+                res.status(SC.BAD_REQUEST).json({
+                    error: 'Saving data in DB failed!'
                 })
+                logger(err, 'ERROR')
             }
-            res.status(200).json({
+            res.status(SC.OK).json({
                 message: 'Event Added Sucessfully!',
                 data: data
             })
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Add Calender Event Function Executed')
+        logger('Add Calender Event Function Executed')
     }
 }
 
@@ -50,10 +48,10 @@ const updateEvent = async (req, res) => {
     try {
         await calenderEventModel.findOne({ _id: id }).exec((err, data) => {
             if (err) {
-                logger.error(err)
-                res.status(400).json({
+                res.status(SC.BAD_REQUEST).json({
                     error: 'Updating Calender Event in DB is failed!'
                 })
+                logger(err, 'ERROR')
             }
             if (data) {
                 title === undefined ? (title = data.title) : null
@@ -63,7 +61,7 @@ const updateEvent = async (req, res) => {
                 let userArr = data.users
 
                 users !== undefined && userEventType === undefined
-                    ? res.status(400).json({
+                    ? res.status(SC.BAD_REQUEST).json({
                           error: 'For updating users specify userEventType as APPEND or OVERWRITE'
                       })
                     : null
@@ -72,7 +70,7 @@ const updateEvent = async (req, res) => {
                     ? (userArr = [...userArr, ...users])
                     : userEventType === 'OVERWRITE' && users !== undefined
                     ? (userArr = users)
-                    : res.status(400).json({
+                    : res.status(SC.BAD_REQUEST).json({
                           error: 'Given user in the users array not found on DB'
                       })
 
@@ -89,25 +87,26 @@ const updateEvent = async (req, res) => {
                         }
                     )
                     .then(() => {
-                        res.status(200).json({
+                        res.status(SC.OK).json({
                             message: 'Calender Event Updated Successfully!'
                         })
                     })
-                    .catch(() => {
-                        res.status(400).json({
+                    .catch((err) => {
+                        res.status(SC.BAD_REQUEST).json({
                             error: 'Calender Event Updation Failed!'
                         })
+                        logger(err, 'ERROR')
                     })
             } else {
-                res.status(404).json({
+                res.status(SC.NOT_FOUND).json({
                     error: 'No Events found!'
                 })
             }
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Update Calender Event Function Executed')
+        logger('Update Calender Event Function Executed')
     }
 }
 
@@ -117,26 +116,26 @@ const getEventById = async (req, res) => {
             .findOne({ _id: req.params.id })
             .exec((err, data) => {
                 if (err) {
-                    res.status(400).json({
+                    res.status(SC.BAD_REQUEST).json({
                         error: 'Getting Calender Event from DB is failed!'
                     })
-                    logger.error(err)
+                    logger(err, 'ERROR')
                 }
                 if (data) {
-                    res.status(200).send({
+                    res.status(SC.OK).send({
                         message: 'Calender Event Fetched Sucessfully',
                         data: data
                     })
                 } else {
-                    res.status(404).json({
+                    res.status(SC.NOT_FOUND).json({
                         error: 'No Event found!'
                     })
                 }
             })
     } catch (err) {
-        logger.info(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get User By Id Function Executed')
+        logger('Get User By Id Function Executed')
     }
 }
 
@@ -165,14 +164,14 @@ const getUserEvents = async (req, res) => {
                 }
             ])
             .sort({ _id: -1 })
-        res.status(200).send({
+        res.status(SC.OK).send({
             message: 'User Calender Event Fetched Sucessfully',
             data: result
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get Calender Event Function Executed')
+        logger('Get Calender Event Function Executed')
     }
 }
 
@@ -180,26 +179,26 @@ const getAllEvents = async (req, res) => {
     try {
         await calenderEventModel.find({}).exec((err, data) => {
             if (err) {
-                res.status(400).json({
+                res.status(SC.BAD_REQUEST).json({
                     error: 'Getting All Calender Events from DB is failed!'
                 })
-                logger.error(err)
+                logger(err, 'ERROR')
             }
             if (data) {
-                res.status(200).send({
+                res.status(SC.OK).send({
                     message: 'All Calender Events Fetched Sucessfully',
                     data: data
                 })
             } else {
-                res.status(404).json({
+                res.status(SC.NOT_FOUND).json({
                     error: 'No Events found!'
                 })
             }
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get All Calender Event Function Executed')
+        logger('Get All Calender Event Function Executed')
     }
 }
 
@@ -209,25 +208,25 @@ const deleteEventById = async (req, res) => {
             .findByIdAndDelete({ _id: req.params.id })
             .exec((err, data) => {
                 if (err) {
-                    res.status(400).json({
+                    res.status(SC.BAD_REQUEST).json({
                         error: 'Deleting Calender Event from DB is failed!'
                     })
-                    logger.error(err)
+                    logger(err, 'ERROR')
                 }
                 if (data) {
-                    res.status(200).json({
+                    res.status(SC.OK).json({
                         message: 'Calender Event deleted successfully!'
                     })
                 } else {
-                    res.status(404).json({
+                    res.status(SC.NOT_FOUND).json({
                         error: 'No Events found!'
                     })
                 }
             })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Delete Calender Event Function Executed')
+        logger('Delete Calender Event Function Executed')
     }
 }
 
@@ -249,22 +248,21 @@ const deleteUserEvents = async (req, res) => {
                     }
                 }
             )
-            .then((data) => {
-                logger.info(data)
-                res.status(200).json({
+            .then(() => {
+                res.status(SC.OK).json({
                     message: 'User Deleted Successfully From this Event!'
                 })
             })
             .catch((err) => {
-                res.status(400).json({
+                res.status(SC.BAD_REQUEST).json({
                     error: 'Deleting User Event is failed!'
                 })
-                logger.error(err)
+                logger(err, 'ERROR')
             })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Delete User Calender Events Function Executed')
+        logger('Delete User Calender Events Function Executed')
     }
 }
 
@@ -292,20 +290,20 @@ const deleteAllUserEvents = async (req, res) => {
                 }
             )
             .then(() => {
-                res.status(200).json({
+                res.status(SC.OK).json({
                     message: 'User Deleted Successfully From all Events!'
                 })
             })
             .catch((err) => {
-                res.status(400).json({
+                res.status(SC.BAD_REQUEST).json({
                     error: 'Deleting All User Events is failed!'
                 })
-                logger.error(err)
+                logger(err, 'ERROR')
             })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Delete User Calender Events Function Executed')
+        logger('Delete User Calender Events Function Executed')
     }
 }
 
@@ -313,25 +311,25 @@ const deleteAllEvents = async (req, res) => {
     try {
         await calenderEventModel.deleteMany({}).exec((err, data) => {
             if (err) {
-                res.status(400).json({
+                res.status(SC.BAD_REQUEST).json({
                     error: 'Deleting All Calender Events from DB is failed!'
                 })
-                logger.error(err)
+                logger(err, 'ERROR')
             }
             if (data) {
-                res.status(200).json({
+                res.status(SC.OK).json({
                     message: 'Document deleted successfully!'
                 })
             } else {
-                res.status(404).json({
+                res.status(SC.NOT_FOUND).json({
                     error: 'No Events found!'
                 })
             }
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Delete All Calender Events Function Executed')
+        logger('Delete All Calender Events Function Executed')
     }
 }
 

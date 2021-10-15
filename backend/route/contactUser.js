@@ -5,28 +5,38 @@
 const express = require('express')
 const router = express.Router()
 const {
-    saveData,
-    getData,
-    getAllData,
-    deleteDataById
+    saveUserContact,
+    getUserContact,
+    getAllUserContacts,
+    deleteUserContactById
 } = require('../controller/contactUser')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
 
-router.post('/contact-user/save', saveData)
-router.get('/contact-user/get/:id', isSignedIn, isValidToken, isAdmin, getData)
+router.post('/contact-user/save', saveUserContact)
+router.get(
+    '/contact-user/get/:id',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    getUserContact
+)
 router.get(
     '/contact-user/get-all',
     isSignedIn,
     isValidToken,
     isAdmin,
-    getAllData
+    getAllUserContacts
 )
 router.delete(
     '/contact-user/delete/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    deleteDataById
+    deleteUserContactById
 )
 
 module.exports = router

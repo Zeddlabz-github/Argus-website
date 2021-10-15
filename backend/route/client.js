@@ -5,32 +5,36 @@
 const express = require('express')
 const router = express.Router()
 const {
-    saveData,
-    getAllData,
-    getDataById,
-    updateDataById,
-    deleteDataById,
-    getPhoto
+    saveClient,
+    getClientById,
+    getAllClient,
+    getClientPhoto,
+    updateClientById,
+    deleteClientById
 } = require('../controller/client')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
 
-router.post('/client/create', isSignedIn, isValidToken, isAdmin, saveData)
-router.get('/client/get/:id', getDataById)
-router.get('/client/get-all', getAllData)
+router.post('/client/create', isSignedIn, isValidToken, isAdmin, saveClient)
+router.get('/client/get/:id', getClientById)
+router.get('/client/get-all', getAllClient)
 router.put(
     '/client/update/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    updateDataById
+    updateClientById
 )
-router.get('/client/get-photo/:id', getPhoto)
+router.get('/client/get-photo/:id', getClientPhoto)
 router.delete(
     '/client/delete/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    deleteDataById
+    deleteClientById
 )
 
 module.exports = router

@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
+const calenderEventSchema = new mongoose.Schema(
     {
         users: [
             {
@@ -35,4 +35,8 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model('calenderEvent', schema, 'calenderEvent')
+module.exports = mongoose.model(
+    'calenderEvent',
+    calenderEventSchema,
+    'calenderEvent'
+)

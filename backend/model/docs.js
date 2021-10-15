@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-let schema = new mongoose.Schema(
+const docsSchema = new mongoose.Schema(
     {
         userId: mongoose.Schema.ObjectId,
         doc1: {
@@ -151,4 +151,4 @@ let schema = new mongoose.Schema(
     { timestamps: true }
 )
 
-module.exports = mongoose.model('userDocs', schema, 'userDocs')
+module.exports = mongoose.model('userDocs', docsSchema, 'userDocs')

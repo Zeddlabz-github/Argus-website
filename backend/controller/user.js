@@ -1,24 +1,22 @@
 const userModel = require('../model/user')
-
-const log4js = require('log4js')
-const logger = log4js.getLogger()
-logger.level = 'debug'
+const { statusCode: SC } = require('../utils/statusCode')
+const { loggerUtil: logger } = require('../utils/logger')
 
 const getUserById = async (req, res, next, id) => {
     try {
         await userModel.findById(id).exec((err, user) => {
             if (err || !user) {
-                return res.status(400).json({
-                    error: 'No user was found in DB'
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'No user was found in DB!'
                 })
             }
             req.profile = user
             next()
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get User By Id Function is Executed')
+        logger('Get User By Id Function is Executed!')
     }
 }
 
@@ -27,11 +25,14 @@ const getUser = (req, res) => {
         req.profile.salt = undefined
         req.profile.encry_password = undefined
         req.profile.__v = undefined
-        return res.json(req.profile)
+        return res.status(SC.OK).json({
+            message: 'User Fetched Successfully!',
+            data: req.profile
+        })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get User Function is Executed')
+        logger( 'Get User Function is Executed!')
     }
 }
 
@@ -39,16 +40,19 @@ const getAllUsers = async (req, res) => {
     try {
         await userModel.find({}).exec((err, user) => {
             if (err || !user) {
-                return res.status(400).json({
+                return res.status(SC.NOT_FOUND).json({
                     error: 'No users were found in a DB!'
                 })
             }
-            res.json(user)
+            res.status(SC.OK).json({
+                message: 'User Fetched Successfully!',
+                data: user
+            })
         })
     } catch (err) {
-        logger.error(err)
+        logger(err, 'ERROR')
     } finally {
-        logger.info('Get All User Function is Executed')
+        logger('Get All Users Function is Executed')
     }
 }
 

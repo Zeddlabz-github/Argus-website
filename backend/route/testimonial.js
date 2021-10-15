@@ -5,32 +5,44 @@
 const express = require('express')
 const router = express.Router()
 const {
-    saveData,
-    getAllData,
-    getDataById,
-    updateDataById,
-    deleteDataById,
-    getPhoto
+    saveTestimonial,
+    getTestimonialById,
+    getAllTestimonials,
+    getTestimonialPhoto,
+    updateTestimonialById,
+    deleteTestimonialById
 } = require('../controller/testimonial')
-const { isSignedIn, isValidToken, isAdmin } = require('../controller/auth')
 
-router.post('/testimonial/create', isSignedIn, isValidToken, isAdmin, saveData)
-router.get('/testimonial/get/:id', getDataById)
-router.get('/testimonial/get-all', getAllData)
+const {
+    isSignedIn,
+    isValidToken,
+    isAdmin
+} = require('../controller/middleware')
+
+router.post(
+    '/testimonial/create',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    saveTestimonial
+)
+router.get('/testimonial/get/:id', getTestimonialById)
+router.get('/testimonial/get-all', getAllTestimonials)
+router.get('/testimonal/get-photo/:id', getTestimonialPhoto)
+
 router.put(
     '/testimonial/update/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    updateDataById
+    updateTestimonialById
 )
-router.get('/testimonal/get-photo/:id', getPhoto)
 router.delete(
     '/testimonial/delete/:id',
     isSignedIn,
     isValidToken,
     isAdmin,
-    deleteDataById
+    deleteTestimonialById
 )
 
 module.exports = router
