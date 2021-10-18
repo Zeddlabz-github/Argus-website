@@ -168,7 +168,7 @@ const getAllEMOS = async (req, res) => {
                     logger(err, 'ERROR')
                 }
                 if (data) {
-                    data?.forEach((data) => {
+                    data.forEach((data) => {
                         data.empImage = undefined
                         data.instructorImage = undefined
                         data.instructorSign = undefined
