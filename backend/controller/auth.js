@@ -62,10 +62,12 @@ const update = async (req, res) => {
                     error: 'User Not Found!'
                 })
             }
+
+            result.employeeDuration &&
             result.employeeDuration.from === undefined
                 ? (result.employeeDuration.from = data.employeeDuration.from)
                 : null
-            result.employeeDuration.to === undefined
+            result.employeeDuration && result.employeeDuration.to === undefined
                 ? (result.employeeDuration.to = data.employeeDuration.to)
                 : null
 

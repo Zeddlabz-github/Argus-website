@@ -30,6 +30,7 @@ const client = require('./route/client')
 const team = require('./route/team')
 const userActivity = require('./route/userActivity')
 const calenderEvent = require('./route/calenderEvent')
+const message = require('./route/message')
 
 app.use(express.static('public'))
 app.use(express.json())
@@ -49,6 +50,7 @@ app.use('/api', client)
 app.use('/api', team)
 app.use('/api', userActivity)
 app.use('/api', calenderEvent)
+app.use('/api', message)
 
 const PORT = 8000
 

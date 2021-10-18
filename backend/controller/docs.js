@@ -215,7 +215,7 @@ const deleteDocById = async (req, res) => {
                 if (err) {
                     logger(err, 'ERROR')
                 }
-                if (data) {
+                if (data.deletedCount) {
                     res.status(SC.OK).json({
                         message: 'Document deleted successfully!'
                     })
@@ -242,7 +242,7 @@ const deleteDocs = async (req, res) => {
                 if (err) {
                     logger(err, 'ERROR')
                 }
-                if (data) {
+                if (data.deletedCount) {
                     docs.forEach((key) => {
                         docModel
                             .updateOne(

@@ -86,7 +86,7 @@ const deleteUserContactById = async (req, res) => {
                 if (err) {
                     logger(err, 'ERROR')
                 }
-                if (data) {
+                if (data.deletedCount) {
                     res.status(SC.OK).json({
                         message: 'Document deleted successfully!'
                     })

@@ -31,7 +31,7 @@ const addEvent = async (req, res) => {
                 logger(err, 'ERROR')
             }
             res.status(SC.OK).json({
-                message: 'Event Added Sucessfully!',
+                message: 'Event added sucessfully!',
                 data: data
             })
         })
@@ -232,7 +232,7 @@ const deleteEventById = async (req, res) => {
 
 const deleteUserEvents = async (req, res) => {
     const id = req.params.id
-    const userId = req.body.userId
+    const userId = req.query.userId
 
     try {
         await calenderEventModel
@@ -291,12 +291,12 @@ const deleteAllUserEvents = async (req, res) => {
             )
             .then(() => {
                 res.status(SC.OK).json({
-                    message: 'User Deleted Successfully From all Events!'
+                    message: 'User deleted successfully from all events!'
                 })
             })
             .catch((err) => {
                 res.status(SC.BAD_REQUEST).json({
-                    error: 'Deleting All User Events is failed!'
+                    error: 'Deleting all user events is failed!'
                 })
                 logger(err, 'ERROR')
             })
@@ -316,7 +316,7 @@ const deleteAllEvents = async (req, res) => {
                 })
                 logger(err, 'ERROR')
             }
-            if (data) {
+            if (data.deletedCount) {
                 res.status(SC.OK).json({
                     message: 'Document deleted successfully!'
                 })

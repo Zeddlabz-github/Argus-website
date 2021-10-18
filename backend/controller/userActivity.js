@@ -113,7 +113,7 @@ const getOtherUserActivity = async (req, res) => {
     req.query.limit !== undefined ? (options.limit = req.query.limit) : null
 
     try {
-        userActivityModel.paginate({ userId }, options, (err, result) => {
+        await userActivityModel.paginate({ userId }, options, (err, result) => {
             if (err) {
                 res.status(SC.BAD_REQUEST).json({
                     error: 'Getting user activity from DB is failed!'
