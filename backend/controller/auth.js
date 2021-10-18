@@ -53,48 +53,8 @@ const signup = async (req, res) => {
 }
 
 const update = async (req, res) => {
-    const {
-        name,
-        lastname,
-        dateOfBirth,
-        gender,
-        weight,
-        height,
-        eyeColor,
-        hairColor,
-        languagesKnown,
-        phone,
-        homePhone,
-        address,
-        country,
-        city,
-        street,
-        streetNumber,
-        suite,
-        province,
-        postalCode,
-        isElilligibeToWorkInCanada,
-        eligibilityType,
-        isValidGuardLicence,
-        securityGuardLicenseNo,
-        isDrive,
-        levelOfEducation,
-        isEducationInCanada,
-        isPriorExperienceInCanada,
-        yearsOfExperience,
-        category,
-        companyName,
-        companyAddress,
-        employeeDuration,
-        isActive,
-        reasonForLeaving,
-        hasCriminalRecord,
-        hasVechicle,
-        hasLicenseToDrive
-    } = req.body
-
     const id = req.auth._id
-
+    let result = req.body
     try {
         await userModel.findOne({ _id: id }).exec((err, data) => {
             if (err || !data) {
@@ -102,80 +62,18 @@ const update = async (req, res) => {
                     error: 'User Not Found!'
                 })
             }
-
-            const arr = []
-            arr.push(Object.keys(req.body))
-
-            arr.filter((val) => val !== employeeDuration).forEach((ele) => {
-                if (ele === undefined && data[`${ele}`] !== null) {
-                    ele = data[`${ele}`]
-                }
-            })
-
-            const employeeDt = {
-                from: null,
-                to: null
-            }
-
-            if (employeeDuration !== undefined) {
-                if (employeeDuration.from !== undefined) {
-                    employeeDt.from = employeeDuration.from
-                }
-                if (employeeDuration.to !== undefined) {
-                    employeeDt.to = employeeDuration.to
-                }
-            } else {
-                if (data.employeeDuration.from !== null) {
-                    employeeDt.from = data.employeeDuration.from
-                }
-                if (data.employeeDuration.to !== null) {
-                    employeeDt.to = data.employeeDuration.to
-                }
-            }
+            result.employeeDuration.from === undefined
+                ? (result.employeeDuration.from = data.employeeDuration.from)
+                : null
+            result.employeeDuration.to === undefined
+                ? (result.employeeDuration.to = data.employeeDuration.to)
+                : null
 
             userModel
                 .updateOne(
                     { _id: id },
                     {
-                        $set: {
-                            name,
-                            lastname,
-                            dateOfBirth,
-                            gender,
-                            weight,
-                            height,
-                            eyeColor,
-                            hairColor,
-                            languagesKnown,
-                            phone,
-                            homePhone,
-                            address,
-                            country,
-                            city,
-                            street,
-                            streetNumber,
-                            suite,
-                            province,
-                            postalCode,
-                            isElilligibeToWorkInCanada,
-                            eligibilityType,
-                            isValidGuardLicence,
-                            securityGuardLicenseNo,
-                            isDrive,
-                            levelOfEducation,
-                            isEducationInCanada,
-                            isPriorExperienceInCanada,
-                            yearsOfExperience,
-                            category,
-                            companyName,
-                            companyAddress,
-                            employeeDuration: employeeDt,
-                            isActive,
-                            reasonForLeaving,
-                            hasCriminalRecord,
-                            hasVechicle,
-                            hasLicenseToDrive
-                        }
+                        $set: result
                     }
                 )
                 .then(() => {
