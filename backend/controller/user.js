@@ -32,7 +32,7 @@ const getUser = (req, res) => {
     } catch (err) {
         logger(err, 'ERROR')
     } finally {
-        logger( 'Get User Function is Executed!')
+        logger('Get User Function is Executed!')
     }
 }
 
@@ -56,8 +56,30 @@ const getAllUsers = async (req, res) => {
     }
 }
 
+const getUserByQuery = async (req, res) => {
+    try {
+        await userModel.find(req.body.query).exec((err, user) => {
+            if (err || !user) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'No users were found in a DB!'
+                })
+            }
+            res.status(SC.OK).json({
+                message: 'User Fetched Successfully!',
+                length: user?.length,
+                data: user
+            })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get All Users Function is Executed')
+    }
+}
+
 module.exports = {
     getUserById,
     getUser,
-    getAllUsers
+    getAllUsers,
+    getUserByQuery
 }
