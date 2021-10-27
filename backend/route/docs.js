@@ -6,7 +6,9 @@ const express = require('express')
 const router = express.Router()
 const {
     uploadDocs,
+    getDocById,
     getUserDocs,
+    getAllUserDocs,
     getDocFile,
     updateDocs,
     deleteDocById,
@@ -27,7 +29,9 @@ router.post(
     isAdmin,
     approveDocs
 )
-router.get('/docs/get', isSignedIn, isValidToken, getUserDocs)
+router.get('/docs/get/:id', isSignedIn, isValidToken, isAdmin, getDocById)
+router.get('/docs/get-user', isSignedIn, isValidToken, getUserDocs)
+router.get('/docs/get-users', isSignedIn, isValidToken, getAllUserDocs)
 router.get('/docs/get-doc/:id', isSignedIn, isValidToken, getDocFile)
 router.put('/docs/update', isSignedIn, isValidToken, updateDocs)
 router.delete(

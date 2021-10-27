@@ -199,6 +199,43 @@ const approveDocs = async (req, res) => {
     }
 }
 
+const getDocById = async (req, res) => {
+    try {
+        await docModel.findOne({ _id: req.params.id }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                _.forIn(data, (value, key) => {
+                    if (
+                        data[`${key}`] !== '_id' &&
+                        'userId' &&
+                        'createdAt' &&
+                        'updatedAt' &&
+                        '__v'
+                    ) {
+                        data[`${key}`]?.data
+                            ? (data[`${key}`].data = undefined)
+                            : null
+                    }
+                })
+                res.status(SC.OK).json({
+                    message: 'Doc Fetched successfully from DB!',
+                    data: data
+                })
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    message: 'No Docs found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get Doc Function is Executed')
+    }
+}
+
 const getUserDocs = async (req, res) => {
     const userId = req.auth._id
     try {
@@ -208,8 +245,16 @@ const getUserDocs = async (req, res) => {
             }
             if (data) {
                 _.forIn(data, (value, key) => {
-                    if (key.includes('doc')) {
-                        data[`${key}`].data = undefined
+                    if (
+                        data[`${key}`] !== '_id' &&
+                        'userId' &&
+                        'createdAt' &&
+                        'updatedAt' &&
+                        '__v'
+                    ) {
+                        data[`${key}`]?.data
+                            ? (data[`${key}`].data = undefined)
+                            : null
                     }
                 })
                 res.status(SC.OK).json({
@@ -226,6 +271,65 @@ const getUserDocs = async (req, res) => {
         logger(err, 'ERROR')
     } finally {
         logger('Get User Docs Function is Executed!')
+    }
+}
+
+const getAllUserDocs = async (req, res) => {
+    //label for pagination
+    const label = {
+        totalDocs: 'totalDocs',
+        docs: 'docs',
+        limit: 'perPage',
+        page: 'currentPageNo',
+        nextPage: 'nextPageNo',
+        prevPage: 'prevPageNo',
+        totalPages: 'pageCount'
+    }
+    let options = {
+        page: 1,
+        limit: 10,
+        customLabels: label
+    }
+    req.query.page !== undefined ? (options.page = req.query.page) : null
+    req.query.limit !== undefined ? (options.limit = req.query.limit) : null
+    try {
+        await docModel.paginate({}, options, (err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                console.log(data)
+                data?.docs?.forEach((val, index) => {
+                    _.forIn(val, (value, key) => {
+                        data.docs[index][key]
+                        if (
+                            data.docs[`${index}`][`${key}`] !== '_id' &&
+                            'userId' &&
+                            'createdAt' &&
+                            'updatedAt' &&
+                            '__v'
+                        ) {
+                            data.docs[`${index}`][`${key}`]?.data
+                                ? (data.docs[`${index}`][`${key}`].data =
+                                      undefined)
+                                : null
+                        }
+                    })
+                })
+                res.status(SC.OK).json({
+                    message: 'User document details fetched successfully!',
+                    data: data
+                })
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    error: 'No document found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Get All User Docs Function is Executed!')
     }
 }
 
@@ -336,7 +440,9 @@ module.exports = {
     uploadDocs,
     updateDocs,
     approveDocs,
+    getDocById,
     getUserDocs,
+    getAllUserDocs,
     getDocFile,
     deleteDocById,
     deleteDocs
