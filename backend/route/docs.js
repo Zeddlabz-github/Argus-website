@@ -10,7 +10,8 @@ const {
     getDocFile,
     updateDocs,
     deleteDocById,
-    deleteDocs
+    deleteDocs,
+    approveDocs
 } = require('../controller/docs')
 const {
     isSignedIn,
@@ -19,6 +20,13 @@ const {
 } = require('../controller/middleware')
 
 router.post('/docs/upload', isSignedIn, isValidToken, uploadDocs)
+router.post(
+    '/docs/approve/:userId',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    approveDocs
+)
 router.get('/docs/get', isSignedIn, isValidToken, getUserDocs)
 router.get('/docs/get-doc/:id', isSignedIn, isValidToken, getDocFile)
 router.put('/docs/update', isSignedIn, isValidToken, updateDocs)

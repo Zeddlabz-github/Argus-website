@@ -115,9 +115,12 @@ const updateDocs = async (req, res) => {
                                         {
                                             $set: {
                                                 [key]: {
+                                                    ...data[key],
                                                     name: fileName,
                                                     data: fileData,
-                                                    contentType: fileType
+                                                    contentType: fileType,
+                                                    updatedAt:
+                                                        new Date().toISOString()
                                                 }
                                             }
                                         }
@@ -144,6 +147,55 @@ const updateDocs = async (req, res) => {
         logger(err, 'ERROR')
     } finally {
         logger('Update Docs Function is Executed!')
+    }
+}
+
+const approveDocs = async (req, res) => {
+    const userId = req.params.userId
+
+    const dataArr = req.body.data
+    try {
+        await docModel.findOne({ userId }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                if (dataArr?.length) {
+                    dataArr?.forEach((val) => {
+                        docModel
+                            .updateOne(
+                                { userId },
+                                {
+                                    $set: {
+                                        [val.docName]: {
+                                            ...data[val.docName],
+                                            isApproved: val.isApproved,
+                                            note: val.note,
+                                            updatedAt: new Date().toISOString()
+                                        }
+                                    }
+                                }
+                            )
+                            .then(() => null)
+                    })
+                    res.status(SC.OK).json({
+                        message: `${dataArr?.length} documents updated succesfully!`
+                    })
+                } else {
+                    res.status(SC.WRONG_ENTITY).json({
+                        error: 'Approve docs array is undefined!'
+                    })
+                }
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    error: 'No document found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Approve Docs Function is Executed!')
     }
 }
 
@@ -283,6 +335,7 @@ const deleteDocs = async (req, res) => {
 module.exports = {
     uploadDocs,
     updateDocs,
+    approveDocs,
     getUserDocs,
     getDocFile,
     deleteDocById,

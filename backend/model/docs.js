@@ -7,7 +7,7 @@ const mongoose = require('mongoose')
 const docsSchema = new mongoose.Schema(
     {
         userId: mongoose.Schema.ObjectId,
-        doc1: {
+        profilePhoto: {
             name: {
                 type: String,
                 default: null
@@ -19,9 +19,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc2: {
+        consentForm: {
             name: {
                 type: String,
                 default: null
@@ -33,9 +49,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc3: {
+        photoIdentification: {
             name: {
                 type: String,
                 default: null
@@ -47,9 +79,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc4: {
+        eligibilityToWork: {
             name: {
                 type: String,
                 default: null
@@ -61,9 +109,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc5: {
+        medicalEmergency: {
             name: {
                 type: String,
                 default: null
@@ -75,9 +139,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc6: {
+        securityGuardLicence: {
             name: {
                 type: String,
                 default: null
@@ -89,9 +169,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc7: {
+        smartServ: {
             name: {
                 type: String,
                 default: null
@@ -103,9 +199,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc8: {
+        policeFoundations: {
             name: {
                 type: String,
                 default: null
@@ -117,9 +229,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc9: {
+        healthAndSafety: {
             name: {
                 type: String,
                 default: null
@@ -131,9 +259,25 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         },
-        doc10: {
+        resume: {
             name: {
                 type: String,
                 default: null
@@ -145,6 +289,22 @@ const docsSchema = new mongoose.Schema(
             contentType: {
                 type: String,
                 default: null
+            },
+            isApproved: {
+                type: Boolean,
+                default: false
+            },
+            note: {
+                type: String,
+                default: ''
+            },
+            createdAt: {
+                type: String,
+                default: new Date().toISOString()
+            },
+            updatedAt: {
+                type: String,
+                default: ''
             }
         }
     },
