@@ -151,6 +151,7 @@ const getAllUserActivities = async (req, res) => {
                                 $push: {
                                     activityId: '$_id',
                                     activityDetails: '$activityDetails',
+                                    createdBy: '$createdBy',
                                     createdAt: {
                                         $dateToString: {
                                             date: '$createdAt',
