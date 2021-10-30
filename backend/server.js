@@ -31,7 +31,9 @@ const team = require('./route/team')
 const userActivity = require('./route/userActivity')
 const calenderEvent = require('./route/calenderEvent')
 const message = require('./route/message')
+const classes = require('./route/class')
 
+//built-in middlewares
 app.use(express.static('public'))
 app.use(express.json())
 app.use(helmet())
@@ -51,6 +53,7 @@ app.use('/api', team)
 app.use('/api', userActivity)
 app.use('/api', calenderEvent)
 app.use('/api', message)
+app.use('/api', classes)
 
 const PORT = 8000
 
