@@ -17,15 +17,14 @@ const {
 const {
     isSignedIn,
     isValidToken,
-    isAdmin,
-    isInstructor
+    isAdminOrInstructor
 } = require('../controller/middleware')
 
 router.post(
     '/class/create',
     isSignedIn,
     isValidToken,
-    isInstructor || isAdmin,
+    isAdminOrInstructor,
     createClass
 )
 
@@ -33,7 +32,7 @@ router.put(
     '/class/enroll/:classId',
     isSignedIn,
     isValidToken,
-    isInstructor || isAdmin,
+    isAdminOrInstructor,
     enrollStudents
 )
 
@@ -41,7 +40,7 @@ router.put(
     '/class/remove-student/:classId',
     isSignedIn,
     isValidToken,
-    isInstructor || isAdmin,
+    isAdminOrInstructor,
     removeStudents
 )
 
@@ -49,7 +48,7 @@ router.put(
     '/class/update/:classId',
     isSignedIn,
     isValidToken,
-    isInstructor || isAdmin,
+    isAdminOrInstructor,
     updateClass
 )
 
@@ -59,7 +58,7 @@ router.get(
     '/class/get-all/',
     isSignedIn,
     isValidToken,
-    isInstructor || isAdmin,
+    isAdminOrInstructor,
     getAllClasses
 )
 
@@ -67,7 +66,7 @@ router.get(
     '/class/get-student/:studentId',
     isSignedIn,
     isValidToken,
-    isInstructor || isAdmin,
+    isAdminOrInstructor,
     getStudentClasses
 )
 
@@ -75,7 +74,7 @@ router.delete(
     '/class/delete/:classId',
     isSignedIn,
     isValidToken,
-    isInstructor || isAdmin,
+    isAdminOrInstructor,
     deleteClassById
 )
 
