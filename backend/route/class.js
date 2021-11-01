@@ -55,7 +55,7 @@ router.put(
 router.get('/class/get/:classId', isSignedIn, isValidToken, getClassById)
 
 router.get(
-    '/class/get-all/',
+    '/class/get-all',
     isSignedIn,
     isValidToken,
     isAdminOrInstructor,

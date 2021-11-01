@@ -100,10 +100,8 @@ const isAdminOrInstructor = (req, res, next) => {
                     error: 'No user was found in DB!'
                 })
             }
-            if (user.role === 2) {
-                isAdmin(req, res, next)
-            } else if (user.role === 4) {
-                isInstructor(req, res, next)
+            if (user.role === 2 || user.role === 3) {
+                next()
             } else {
                 return res.status(SC.UNAUTHORIZED).json({
                     error: 'Not an admin or an Instructor!'
