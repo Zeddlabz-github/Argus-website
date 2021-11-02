@@ -187,6 +187,7 @@ const getAllBuckets = async (req, res) => {
                 logger(err, 'ERROR')
             }
             if (data) {
+                data.forEach((val) => (val.students = undefined))
                 res.status(SC.OK).json({
                     message: 'Buckets fetched successfully!',
                     data: data
