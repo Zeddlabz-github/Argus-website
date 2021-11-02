@@ -18,7 +18,7 @@ const createBucket = async (req, res) => {
         }
     }
 
-    const userId = req.auth._id
+    const userId = req.params.userId
     const { bucketName, students } = req.body
     try {
         await userModel.findOne({ _id: userId }).exec((err, data) => {
