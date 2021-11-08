@@ -2,6 +2,7 @@
  * @author utkarsh
  */
 
+const userModel = require('../model/user.js')
 const doc2Model = require('../model/doc2')
 const formidable = require('formidable')
 const { statusCode: SC } = require('../utils/statusCode')
@@ -25,27 +26,33 @@ const createDoc = async (req, res) => {
                             error: 'Document is already available for this user!'
                         })
                     } else {
-                        const docs = new doc2Model()
-                        docs.userId = userId
-                        docs.name = fields.name
-                        if (file.image) {
-                            if (file.image.size > 3145728) {
-                                return res.status(400).json({
-                                    error: 'File size too big!'
-                                })
+                        userModel.findOne({ _id: userId }).then((response) => {
+                            const docs = new doc2Model()
+                            docs.username =
+                                response?.name +
+                                ' ' +
+                                (response.lastname ? response.lastname : '')
+                            docs.userId = userId
+                            docs.name = fields.name
+                            if (file.image) {
+                                if (file.image.size > 3145728) {
+                                    return res.status(400).json({
+                                        error: 'File size too big!'
+                                    })
+                                }
+                                docs.data = fs.readFileSync(file.image.path)
+                                docs.contentType = file.image.type
                             }
-                            docs.data = fs.readFileSync(file.image.path)
-                            docs.contentType = file.image.type
-                        }
-                        docs.save((err) => {
-                            if (err) {
-                                logger(err, 'ERROR')
-                                return res.status(SC.BAD_REQUEST).json({
-                                    error: 'Saving data in DB failed!'
+                            docs.save((err) => {
+                                if (err) {
+                                    logger(err, 'ERROR')
+                                    return res.status(SC.BAD_REQUEST).json({
+                                        error: 'Saving data in DB failed!'
+                                    })
+                                }
+                                res.status(SC.OK).json({
+                                    message: `Document saved successfully!`
                                 })
-                            }
-                            res.status(SC.OK).json({
-                                message: `Document saved successfully!`
                             })
                         })
                     }
@@ -152,10 +159,7 @@ const getUsersDocAdmin = async (req, res) => {
 const getAllDocs = async (req, res) => {
     try {
         await doc2Model
-            .find(
-                { $or: [{ isApproved: false }, { isApproved: null }] },
-                { data: 0, contentType: 0 }
-            )
+            .find({}, { data: 0, contentType: 0 })
             .exec((err, data) => {
                 if (err) {
                     logger(err, 'ERROR')
@@ -197,11 +201,33 @@ const approveDoc = async (req, res) => {
     }
 }
 
+const getDoc = async (req, res) => {
+    const id = req.params.id
+    try {
+        await doc2Model.findOne({ _id: id }).exec((err, data) => {
+            if (err) {
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                res.status(SC.OK).json({
+                    message: 'Doc Fetched successfully from DB!',
+                    data: data
+                })
+            }
+        })
+    } catch (error) {
+        logger(error, 'ERROR')
+    } finally {
+        logger('Get Single Doc Function is Executed')
+    }
+}
+
 module.exports = {
     createDoc,
     reuploadDoc,
     getUsersDoc,
     getUsersDocAdmin,
     getAllDocs,
-    approveDoc
+    approveDoc,
+    getDoc
 }
