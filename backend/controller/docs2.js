@@ -99,7 +99,7 @@ const reuploadDoc = async (req, res) => {
     } catch (err) {
         logger(err, 'ERROR')
     } finally {
-        logger('Upload Docs Function is Executed')
+        logger('ReUpload Docs Function is Executed')
     }
 }
 
@@ -122,7 +122,7 @@ const getUsersDoc = async (req, res) => {
     } catch (error) {
         logger(error, 'ERROR')
     } finally {
-        logger('Upload Docs Function is Executed')
+        logger('Get User Docs Function is Executed')
     }
 }
 
@@ -145,7 +145,7 @@ const getUsersDocAdmin = async (req, res) => {
     } catch (error) {
         logger(error, 'ERROR')
     } finally {
-        logger('Upload Docs Function is Executed')
+        logger('Get Users Docs Admin Function is Executed')
     }
 }
 
@@ -170,7 +170,7 @@ const getAllDocs = async (req, res) => {
     } catch (error) {
         logger(error, 'ERROR')
     } finally {
-        logger('Upload Docs Function is Executed')
+        logger('Get All Docs Function is Executed')
     }
 }
 
@@ -193,7 +193,7 @@ const approveDoc = async (req, res) => {
     } catch (error) {
         logger(error, 'ERROR')
     } finally {
-        logger('Upload Docs Function is Executed')
+        logger('Approve Docs Function is Executed')
     }
 }
 
