@@ -218,7 +218,7 @@ const forgotPassword = async (req, res) => {
     } catch (err) {
         logger(err, 'ERROR')
     } finally {
-        logger(`User Signed in - ${email}`)
+        logger(`Forgot Password Function  Executed`)
     }
 }
 
