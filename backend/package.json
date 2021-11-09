@@ -4,7 +4,7 @@
   "description": "Argus-website backend",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "test": "npm test"
   },
   "author": "krish",
@@ -26,6 +26,7 @@
     "mongoose": "^5.12.0",
     "mongoose-paginate-v2": "^1.4.2",
     "node-fetch": "^3.0.0",
+    "nodejs-unique-numeric-id-generator": "^1.0.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
