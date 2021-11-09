@@ -177,6 +177,11 @@ const forgotPassword = async (req, res) => {
     }
     const { oldPassword, newPassword } = req.body
     try {
+        if (oldPassword === newPassword) {
+            return res.status(SC.WRONG_ENTITY).json({
+                error: 'Old and new Password are same!'
+            })
+        }
         await userModel.findOne({ _id: userId }, (err, user) => {
             if (err || !user) {
                 return res.status(SC.NOT_FOUND).json({
