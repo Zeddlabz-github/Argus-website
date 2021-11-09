@@ -144,6 +144,56 @@ const signin = async (req, res) => {
     }
 }
 
+const forgotPassword = async (req, res) => {
+    const userId = req.params.userId
+    const errors = validate(req)
+    if (!errors.isEmpty()) {
+        return res.status(SC.WRONG_ENTITY).json({
+            error: errors.array()[0].msg
+        })
+    }
+    const { oldPassword, newPassword } = req.body
+    try {
+        await userModel.findOne({ _id: userId }, (err, user) => {
+            if (err || !user) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: "User id doesn't exist in DB!"
+                })
+            }
+            if (!user.authenticate(oldPassword)) {
+                return res.status(SC.UNAUTHORIZED).json({
+                    error: 'Oops!, Your old password is wrong!!'
+                })
+            } else {
+                userModel
+                    .updateOne(
+                        { _id: userId },
+                        {
+                            $set: {
+                                encrypted_password:
+                                    user.securePassword(newPassword)
+                            }
+                        }
+                    )
+                    .then(() => {
+                        res.status(SC.OK).json({
+                            message: 'User Password changed successfully!'
+                        })
+                    })
+                    .catch(() => {
+                        res.status(SC.BAD_REQUEST).json({
+                            error: 'Password Updation Failed!'
+                        })
+                    })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger(`User Signed in - ${email}`)
+    }
+}
+
 const signout = (req, res) => {
     res.clearCookie('Token')
 
@@ -323,6 +373,7 @@ const facebookLogin = async (req, res) => {
 module.exports = {
     signup,
     signin,
+    forgotPassword,
     update,
     signout,
     googleLogin,

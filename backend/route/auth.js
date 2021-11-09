@@ -11,7 +11,8 @@ const {
     update,
     signout,
     googleLogin,
-    facebookLogin
+    facebookLogin,
+    forgotPassword
 } = require('../controller/auth')
 
 const { isSignedIn, isValidToken } = require('../controller/middleware')
@@ -36,6 +37,16 @@ router.post(
             .withMessage('Password field is required')
     ],
     signin
+)
+
+router.post(
+    '/forgot-password/:userId',
+    [
+        check('newPassword')
+            .isLength({ min: 6 })
+            .withMessage('New Password should be minimum of 6 characters')
+    ],
+    forgotPassword
 )
 
 router.post('/googlelogin', googleLogin)
