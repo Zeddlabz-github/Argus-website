@@ -167,7 +167,7 @@ const signin = async (req, res) => {
     }
 }
 
-const forgotPassword = async (req, res) => {
+const changePassword = async (req, res) => {
     const userId = req.params.userId
     const errors = validate(req)
     if (!errors.isEmpty()) {
@@ -401,7 +401,7 @@ const facebookLogin = async (req, res) => {
 module.exports = {
     signup,
     signin,
-    forgotPassword,
+    changePassword,
     update,
     updateRole,
     signout,

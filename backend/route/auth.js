@@ -13,7 +13,7 @@ const {
     signout,
     googleLogin,
     facebookLogin,
-    forgotPassword
+    changePassword
 } = require('../controller/auth')
 
 const {
@@ -45,13 +45,13 @@ router.post(
 )
 
 router.post(
-    '/forgot-password/:userId',
+    '/change-password/:userId',
     [
         check('newPassword')
             .isLength({ min: 6 })
             .withMessage('New Password should be minimum of 6 characters')
     ],
-    forgotPassword
+    changePassword
 )
 
 router.post('/googlelogin', googleLogin)
