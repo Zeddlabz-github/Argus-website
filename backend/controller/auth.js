@@ -228,6 +228,7 @@ const changePassword = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
     const email = req.body.email
+    const url = req.body.url
     const transporter = nodemailer.createTransport({
         service: 'google',
         pool: true,
@@ -250,7 +251,7 @@ const forgotPassword = async (req, res) => {
         }
         if (user) {
             const randomId = uuid.URL
-            const link = `https://localhost:3000/${randomId}`
+            const link = `${url}/${randomId}`
             let mailOptions = {
                 from: '"Argus security" <karshchaud@gmail.com>',
                 to: user?.email,
