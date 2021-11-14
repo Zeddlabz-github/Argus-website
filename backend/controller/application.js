@@ -123,8 +123,8 @@ const getApplicationById = async (req, res) => {
 const getAllApplications = async (req, res) => {
     //label for pagination
     const label = {
-        totalDocs: 'totalMessages',
-        docs: 'messages',
+        totalDocs: 'totalApplications',
+        docs: 'applications',
         limit: 'perPage',
         page: 'currentPageNo',
         nextPage: 'nextPageNo',
