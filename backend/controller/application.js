@@ -189,10 +189,37 @@ const deleteApplicationById = async (req, res) => {
     }
 }
 
+const deleteAllApplications = async (req, res) => {
+    try {
+        await applicationModel.deleteMany({}).exec((err, data) => {
+            if (err) {
+                res.status(SC.BAD_REQUEST).json({
+                    error: 'Deleting application from DB is failed!'
+                })
+                logger(err, 'ERROR')
+            }
+            if (data) {
+                res.status(SC.OK).json({
+                    message: 'All Applications deleted successfully!'
+                })
+            } else {
+                res.status(SC.NOT_FOUND).json({
+                    error: 'No applications found!'
+                })
+            }
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Delete All Application Function is Executed!')
+    }
+}
+
 module.exports = {
     createApplication,
     updateApplication,
     getApplicationById,
     getAllApplications,
-    deleteApplicationById
+    deleteApplicationById,
+    deleteAllApplications
 }

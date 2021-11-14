@@ -9,7 +9,8 @@ const {
     updateApplication,
     getApplicationById,
     getAllApplications,
-    deleteApplicationById
+    deleteApplicationById,
+    deleteAllApplications
 } = require('../controller/application')
 
 const {
@@ -50,6 +51,14 @@ router.delete(
     isValidToken,
     isAdmin,
     deleteApplicationById
+)
+
+router.delete(
+    '/application/delete-all',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    deleteAllApplications
 )
 
 module.exports = router
