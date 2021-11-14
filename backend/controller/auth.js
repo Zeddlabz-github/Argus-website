@@ -12,7 +12,7 @@ const { OAuth2Client: OAuth } = require('google-auth-library')
 const nodemailer = require('nodemailer')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
-const { v5: uuid } = require('uuid')
+const { v4: uuid } = require('uuid')
 const moment = require('moment')
 
 const signup = async (req, res) => {
@@ -250,7 +250,7 @@ const forgotPassword = async (req, res) => {
             logger(err, 'ERROR')
         }
         if (user) {
-            const randomId = uuid.URL
+            const randomId = uuid()
             const link = `${url}/${randomId}`
             let mailOptions = {
                 from: '"Argus security" <karshchaud@gmail.com>',
@@ -345,7 +345,6 @@ const forgotPasswordChange = async (req, res) => {
                                 error: "User id doesn't exist in DB!"
                             })
                         }
-
                         userModel
                             .updateOne(
                                 { _id: data?.userId },
@@ -378,12 +377,16 @@ const forgotPasswordChange = async (req, res) => {
                                 })
                             })
                     })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No forgot password document found!'
+                    })
                 }
             })
     } catch (err) {
         logger(err, 'ERROR')
     } finally {
-        logger(`Forgot Password Function  Executed`)
+        logger(`Forgot Password Change Function Executed`)
     }
 }
 
