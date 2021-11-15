@@ -14,6 +14,7 @@ const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 const { v4: uuid } = require('uuid')
 const moment = require('moment')
+const { generateDocumentId } = require('../utils/generateId.js')
 
 const signup = async (req, res) => {
     const errors = validate(req)
@@ -23,15 +24,28 @@ const signup = async (req, res) => {
         })
     }
     const { email } = req.body
+    let result = req.body
     try {
-        await userModel.findOne({ email }, (err, user) => {
+        await userModel.findOne({ email }, async (err, user) => {
             if (err || user) {
                 return res.status(SC.WRONG_ENTITY).json({
                     error: 'E-Mail already has been registered!',
                     suggestion: 'Try using some other E-mail.'
                 })
             } else {
-                const user = new userModel(req.body)
+                let suffix = 0
+                await userModel
+                    .findOne({})
+                    .sort({ createdAt: -1 })
+                    .then((data) => {
+                        if (data?.docId) {
+                            suffix = parseInt(data.docId?.substr(3)) + 1
+                        } else {
+                            suffix = '000000'
+                        }
+                    })
+                result.docId = `USR${generateDocumentId(suffix, 6)}`
+                const user = new userModel(result)
                 user.save((err, user) => {
                     if (err) {
                         return res.status(SC.BAD_REQUEST).json({
@@ -43,7 +57,8 @@ const signup = async (req, res) => {
                         data: {
                             id: user._id,
                             email: user.email,
-                            password: user.encrypted_password
+                            password: user.encrypted_password,
+                            docId: user.docId
                         }
                     })
                 })

@@ -8,6 +8,10 @@ const { v1: uuidv1 } = require('uuid')
 
 const userSchema = new mongoose.Schema(
     {
+        docId: {
+            type: String,
+            required: true
+        },
         //personal info
         name: {
             type: String,
