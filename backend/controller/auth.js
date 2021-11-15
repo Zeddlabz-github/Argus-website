@@ -5,15 +5,15 @@
 const userModel = require('../model/user.js')
 const forgotPasswordModel = require('../model/forgotPassword')
 const jwt = require('jsonwebtoken')
-const { validationResult: validate } = require('express-validator')
+const moment = require('moment')
+const nodemailer = require('nodemailer')
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args))
+const { validationResult: validate } = require('express-validator')
 const { OAuth2Client: OAuth } = require('google-auth-library')
-const nodemailer = require('nodemailer')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 const { v4: uuid } = require('uuid')
-const moment = require('moment')
 const { generateDocumentId } = require('../utils/generateId.js')
 
 const signup = async (req, res) => {
@@ -33,6 +33,7 @@ const signup = async (req, res) => {
                     suggestion: 'Try using some other E-mail.'
                 })
             } else {
+                const prefix = 'USR'
                 let suffix = 0
                 await userModel
                     .findOne({})
@@ -44,7 +45,7 @@ const signup = async (req, res) => {
                             suffix = '000000'
                         }
                     })
-                result.docId = `USR${generateDocumentId(suffix, 6)}`
+                result.docId = `${prefix}${generateDocumentId(suffix, 6)}`
                 const user = new userModel(result)
                 user.save((err, user) => {
                     if (err) {

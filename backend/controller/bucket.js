@@ -28,6 +28,7 @@ const createBucket = async (req, res) => {
                 logger(err, 'ERROR')
             }
             if (data) {
+                const prefix = 'BKT'
                 let suffix = 0
                 await bucketModel
                     .findOne({})
@@ -39,7 +40,7 @@ const createBucket = async (req, res) => {
                             suffix = '000000'
                         }
                     })
-                result.docId = `BKT${generateDocumentId(suffix, 6)}`
+                result.docId = `${prefix}${generateDocumentId(suffix, 6)}`
                 result.bucketName = bucketName
                 result.students = students
                 result.noOfStudents = students?.length

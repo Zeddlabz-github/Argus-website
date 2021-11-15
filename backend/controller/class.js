@@ -29,6 +29,7 @@ const createClass = async (req, res) => {
                     logger(err, 'ERROR')
                 }
                 if (data) {
+                    const prefix = 'CLS'
                     let suffix = 0
                     await classModel
                         .findOne({})
@@ -40,7 +41,7 @@ const createClass = async (req, res) => {
                                 suffix = '000000'
                             }
                         })
-                    result.docId = `CLS${generateDocumentId(suffix, 6)}`
+                    result.docId = `${prefix}${generateDocumentId(suffix, 6)}`
                     result.instructorId = instructorId
                     result.instructorName = data.name
                     result.classname = classname
