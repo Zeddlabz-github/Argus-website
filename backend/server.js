@@ -37,6 +37,7 @@ const bucket = require('./route/bucket')
 const courseMaterial = require('./route/courseMaterial')
 const coupon = require('./route/coupon')
 const application = require('./route/application')
+const requirements = require('./route/requirements')
 
 //built-in middlewares
 app.use(express.static('public'))
@@ -64,6 +65,7 @@ app.use('/api', bucket)
 app.use('/api', courseMaterial)
 app.use('/api', coupon)
 app.use('/api', application)
+app.use('/api', requirements)
 
 const PORT = process.env.PORT || 8000
 
