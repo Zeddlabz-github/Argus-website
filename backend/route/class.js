@@ -12,7 +12,8 @@ const {
     getClassById,
     getAllClasses,
     getStudentClasses,
-    deleteClassById
+    deleteClassById,
+    markAttendance
 } = require('../controller/class')
 const {
     isSignedIn,
@@ -62,13 +63,7 @@ router.get(
     getAllClasses
 )
 
-router.get(
-    '/class/get-student/:studentId',
-    isSignedIn,
-    isValidToken,
-    isAdminOrInstructor,
-    getStudentClasses
-)
+router.get('/class/get-student', isSignedIn, isValidToken, getStudentClasses)
 
 router.delete(
     '/class/delete/:classId',
@@ -76,6 +71,14 @@ router.delete(
     isValidToken,
     isAdminOrInstructor,
     deleteClassById
+)
+
+router.put(
+    '/class/attendence/:id/:studentId',
+    isSignedIn,
+    isValidToken,
+    isAdminOrInstructor,
+    markAttendance
 )
 
 module.exports = router

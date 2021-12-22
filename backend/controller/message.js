@@ -12,6 +12,7 @@ const createMessage = async (req, res) => {
     let result = {
         userId: '',
         userName: '',
+        position: '',
         subject: '',
         message: '',
         recipients: []
@@ -29,6 +30,10 @@ const createMessage = async (req, res) => {
                 data.name !== null
                     ? (result.userName = data.name)
                     : (result.userName = 'unknown')
+                data.role !== null
+                    ? (result.position =
+                          data.role === 2 ? 'Admin' : 'Instructor')
+                    : (result.position = 'unknown')
                 result.subject = subject
                 result.message = message
                 result.recipients = recipients
@@ -120,7 +125,8 @@ const getAllMessage = async (req, res) => {
     let options = {
         page: 1,
         limit: 10,
-        customLabels: label
+        customLabels: label,
+        sort: { createdAt: -1 }
     }
     req.query.page !== undefined ? (options.page = req.query.page) : null
     req.query.limit !== undefined ? (options.limit = req.query.limit) : null

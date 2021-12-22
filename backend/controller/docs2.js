@@ -5,6 +5,7 @@
 const userModel = require('../model/user.js')
 const doc2Model = require('../model/doc2')
 const formidable = require('formidable')
+const sharp = require('sharp')
 const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 const fs = require('fs')
@@ -12,9 +13,11 @@ const fs = require('fs')
 const createDoc = async (req, res) => {
     const userId = req.auth._id
     const form = new formidable.IncomingForm()
+
     form.keepExtensions = true
     try {
-        await form.parse(req, (err, fields, file) => {
+        form.parse(req, (err, fields, file) => {
+            console.log(err)
             doc2Model
                 .findOne({ userId, name: fields.name })
                 .exec((err, data) => {
@@ -33,6 +36,7 @@ const createDoc = async (req, res) => {
                                 ' ' +
                                 (response.lastname ? response.lastname : '')
                             docs.userId = userId
+                            docs.userDocId = response?.docId
                             docs.name = fields.name
                             if (file.image) {
                                 if (file.image.size > 3145728) {
@@ -53,6 +57,28 @@ const createDoc = async (req, res) => {
                                 res.status(SC.OK).json({
                                     message: `Document saved successfully!`
                                 })
+
+                                if (fields.name === 'Profile Photo') {
+                                    sharp(fs.readFileSync(file.image.path))
+                                        .resize(200)
+                                        .jpeg({ mozjpeg: true })
+                                        .toBuffer()
+                                        .then((data) => {
+                                            userModel.updateOne(
+                                                { _id: userId },
+                                                {
+                                                    profilePhoto: {
+                                                        data,
+                                                        contentType:
+                                                            file.image.type
+                                                    }
+                                                }
+                                            )
+                                        })
+                                        .catch((err) => {
+                                            logger(err, 'ERROR')
+                                        })
+                                }
                             })
                         })
                     }
@@ -86,14 +112,34 @@ const reuploadDoc = async (req, res) => {
                         {
                             data: fileData,
                             contentType: fileType,
-                            isApproved: false,
+                            isApproved: null,
                             note: ''
                         }
                     )
                     .then(() => {
-                        return res.status(SC.OK).json({
+                        res.status(SC.OK).json({
                             message: `Documents updated succesfully!`
                         })
+
+                        if (fields.name === 'Profile Photo') {
+                            sharp(fs.readFileSync(file.image.path))
+                                .resize(200)
+                                .toBuffer()
+                                .then((data) => {
+                                    userModel.updateOne(
+                                        { _id: userId },
+                                        {
+                                            profilePhoto: {
+                                                data,
+                                                contentType: file.image.type
+                                            }
+                                        }
+                                    )
+                                })
+                                .catch((err) => {
+                                    logger(err, 'ERROR')
+                                })
+                        }
                     })
                     .catch((err) => {
                         logger(err, 'ERROR')
@@ -101,6 +147,8 @@ const reuploadDoc = async (req, res) => {
                             error: 'Error updating document'
                         })
                     })
+            } else {
+                console.log('hi')
             }
         })
     } catch (err) {
@@ -160,6 +208,8 @@ const getAllDocs = async (req, res) => {
     try {
         await doc2Model
             .find({}, { data: 0, contentType: 0 })
+            .sort({ createdAt: -1 })
+
             .exec((err, data) => {
                 if (err) {
                     logger(err, 'ERROR')

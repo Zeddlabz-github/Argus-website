@@ -12,7 +12,23 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        trainingNo: {
+            type: String,
+            default: null
+        },
         //personal info
+
+        profilePhoto: {
+            data: {
+                type: Buffer,
+                default: null
+            },
+            contentType: {
+                type: String,
+                default: null
+            }
+        },
+
         name: {
             type: String,
             maxlength: 32,
@@ -59,6 +75,16 @@ const userSchema = new mongoose.Schema(
         languagesKnown: {
             type: Array,
             default: null
+        },
+
+        blocked: {
+            type: Boolean,
+            default: false
+        },
+
+        lastLoggedIn: {
+            type: String,
+            default: new Date()
         },
 
         //Course bought
@@ -174,42 +200,53 @@ const userSchema = new mongoose.Schema(
         },
 
         //employment record
-        category: {
-            type: String,
-            trim: true,
-            default: null
-        },
-        companyName: {
-            type: String,
-            trim: true,
-            default: null
-        },
-        companyAddress: {
-            type: String,
-            trim: true,
-            default: null
-        },
-        employeeDuration: {
-            from: {
-                type: String,
-                trim: true,
-                default: null
-            },
-            to: {
-                type: String,
-                trim: true,
-                default: null
+
+        employmentRecord: [
+            {
+                category: {
+                    type: String,
+                    trim: true,
+                    default: null
+                },
+                companyName: {
+                    type: String,
+                    trim: true,
+                    default: null
+                },
+                companyAddress: {
+                    type: String,
+                    trim: true,
+                    default: null
+                },
+                employeeDurationFrom: {
+                    type: String,
+                    trim: true,
+                    default: null
+                },
+                employeeDurationTo: {
+                    type: String,
+                    trim: true,
+                    default: null
+                },
+                isActive: {
+                    type: String,
+                    enum: ['YES', 'NO', null],
+                    default: null
+                },
+                reasonForLeaving: {
+                    type: String,
+                    trim: true,
+                    default: null
+                }
             }
-        },
-        isActive: {
-            type: String,
-            enum: ['YES', 'NO', null],
-            default: null
-        },
-        reasonForLeaving: {
-            type: String,
-            trim: true,
-            default: null
+        ],
+
+        jobSearch: {
+            looking: String,
+            wantEmail: String,
+            prefferedCity: String,
+            availability: String,
+            wageRange: String
         },
 
         //background declaration
@@ -232,7 +269,10 @@ const userSchema = new mongoose.Schema(
         },
 
         //class cretification
-
+        classAttended: {
+            type: Array,
+            default: []
+        },
         //credentials
         encrypted_password: {
             type: String,

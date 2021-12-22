@@ -7,57 +7,20 @@ const { statusCode: SC } = require('../utils/statusCode')
 const { loggerUtil: logger } = require('../utils/logger')
 
 const createApplication = async (req, res) => {
-    const {
-        name,
-        email,
-        elegibleToWorkInCanada,
-        eligibilityType,
-        validSecurityGuardLicence,
-        licenceNo,
-        canDrive,
-        highestLevelOfEducation,
-        educationInCanada,
-        priorExperience,
-        yearsOfExp
-    } = req.body
-
     try {
-        await applicationModel.findOne({ email }).exec((err, data) => {
+        const application = new applicationModel(req.body)
+
+        application.save((err, data) => {
             if (err) {
                 logger(err, 'ERROR')
-            }
-            if (data) {
                 return res.status(SC.BAD_REQUEST).json({
-                    error: 'Email already registered for application on DB!'
-                })
-            } else {
-                const application = new applicationModel({
-                    name,
-                    email,
-                    elegibleToWorkInCanada,
-                    eligibilityType,
-                    validSecurityGuardLicence,
-                    licenceNo,
-                    canDrive,
-                    highestLevelOfEducation,
-                    educationInCanada,
-                    priorExperience,
-                    yearsOfExp
-                })
-
-                application.save((err, data) => {
-                    if (err) {
-                        logger(err, 'ERROR')
-                        return res.status(SC.BAD_REQUEST).json({
-                            error: 'Creating application in DB is failed!'
-                        })
-                    }
-                    res.status(SC.OK).json({
-                        message: 'Application created successfully!',
-                        data: data
-                    })
+                    error: 'Creating application in DB is failed!'
                 })
             }
+            res.status(SC.OK).json({
+                message: 'Application created successfully!',
+                data: data
+            })
         })
     } catch (err) {
         logger(err, 'ERROR')

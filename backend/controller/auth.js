@@ -58,7 +58,6 @@ const signup = async (req, res) => {
                         data: {
                             id: user._id,
                             email: user.email,
-                            password: user.encrypted_password,
                             docId: user.docId
                         }
                     })
@@ -82,15 +81,6 @@ const update = async (req, res) => {
                     error: 'User Not Found!'
                 })
             }
-
-            result.employeeDuration &&
-            result.employeeDuration.from === undefined
-                ? (result.employeeDuration.from = data.employeeDuration.from)
-                : null
-            result.employeeDuration && result.employeeDuration.to === undefined
-                ? (result.employeeDuration.to = data.employeeDuration.to)
-                : null
-
             userModel
                 .updateOne(
                     { _id: id },
@@ -114,6 +104,185 @@ const update = async (req, res) => {
         logger(err, 'ERROR')
     } finally {
         logger('User Update Function is Executed')
+    }
+}
+
+const updateAdmin = async (req, res) => {
+    const id = req.params.id
+    let result = req.body
+    try {
+        await userModel.findOne({ _id: id }).exec((err, data) => {
+            if (err || !data) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'User Not Found!'
+                })
+            }
+            userModel
+                .updateOne(
+                    { _id: id },
+                    {
+                        $set: result
+                    }
+                )
+                .then(() => {
+                    res.status(SC.OK).json({
+                        message: 'User Updated Successfully!'
+                    })
+                })
+                .catch((err) => {
+                    res.status(SC.INTERNAL_SERVER_ERROR).json({
+                        error: 'User Updation Failed!'
+                    })
+                    logger(err, 'ERROR')
+                })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('User Update Function is Executed')
+    }
+}
+
+const addEmploymentRecord = async (req, res) => {
+    const id = req.auth._id
+    let result = req.body
+    try {
+        await userModel.findOne({ _id: id }).exec((err, data) => {
+            if (err || !data) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'User Not Found!'
+                })
+            }
+            userModel
+                .updateOne(
+                    { _id: id },
+                    {
+                        $push: { employmentRecord: result }
+                    }
+                )
+                .then(() => {
+                    res.status(SC.OK).json({
+                        message: 'User Employment Record Added Successfully!'
+                    })
+                })
+                .catch((err) => {
+                    res.status(SC.INTERNAL_SERVER_ERROR).json({
+                        error: 'User Updation Failed!'
+                    })
+                    logger(err, 'ERROR')
+                })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('User Employment Record Add Function is Executed')
+    }
+}
+
+const deleteEmploymentRecord = async (req, res) => {
+    const id = req.auth._id
+    let recordId = req.params.id
+    try {
+        await userModel.findOne({ _id: id }).exec((err, data) => {
+            if (err || !data) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'User Not Found!'
+                })
+            }
+            userModel
+                .updateOne(
+                    { _id: id },
+                    {
+                        $pull: { employmentRecord: { _id: recordId } }
+                    }
+                )
+                .then(() => {
+                    res.status(SC.OK).json({
+                        message: 'User Employment Record Deleted Successfully!'
+                    })
+                })
+                .catch((err) => {
+                    res.status(SC.INTERNAL_SERVER_ERROR).json({
+                        error: 'User Updation Failed!'
+                    })
+                    logger(err, 'ERROR')
+                })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('User Employment Record Delete Function is Executed')
+    }
+}
+
+const addEmploymentRecordAdmin = async (req, res) => {
+    const id = req.params.id
+    let result = req.body
+    try {
+        await userModel.findOne({ _id: id }).exec((err, data) => {
+            if (err || !data) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'User Not Found!'
+                })
+            }
+            userModel
+                .updateOne(
+                    { _id: id },
+                    {
+                        $push: { employmentRecord: result }
+                    }
+                )
+                .then(() => {
+                    res.status(SC.OK).json({
+                        message: 'User Employment Record Added Successfully!'
+                    })
+                })
+                .catch((err) => {
+                    res.status(SC.INTERNAL_SERVER_ERROR).json({
+                        error: 'User Updation Failed!'
+                    })
+                    logger(err, 'ERROR')
+                })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('User Employment Record Add Function is Executed')
+    }
+}
+const deleteEmploymentRecordAdmin = async (req, res) => {
+    const id = req.params.userId
+    let recordId = req.params.id
+    try {
+        await userModel.findOne({ _id: id }).exec((err, data) => {
+            if (err || !data) {
+                return res.status(SC.NOT_FOUND).json({
+                    error: 'User Not Found!'
+                })
+            }
+            userModel
+                .updateOne(
+                    { _id: id },
+                    {
+                        $pull: { employmentRecord: { _id: recordId } }
+                    }
+                )
+                .then(() => {
+                    res.status(SC.OK).json({
+                        message: 'User Employment Record Deleted Successfully!'
+                    })
+                })
+                .catch((err) => {
+                    res.status(SC.INTERNAL_SERVER_ERROR).json({
+                        error: 'User Updation Failed!'
+                    })
+                    logger(err, 'ERROR')
+                })
+        })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('User Employment Record Delete Function is Executed')
     }
 }
 
@@ -188,7 +357,7 @@ const signin = async (req, res) => {
 }
 
 const changePassword = async (req, res) => {
-    const userId = req.params.userId
+    const userId = req.auth._id
     const errors = validate(req)
     if (!errors.isEmpty()) {
         return res.status(SC.WRONG_ENTITY).json({
@@ -266,8 +435,8 @@ const forgotPassword = async (req, res) => {
             logger(err, 'ERROR')
         }
         if (user) {
-            const randomId = uuid()
-            const link = `${url}/${randomId}`
+            const randomId = uuid.URL
+            const link = `${url}/forgot-pass/${randomId}`
             let mailOptions = {
                 from: '"Argus security" <karshchaud@gmail.com>',
                 to: user?.email,
@@ -291,8 +460,7 @@ const forgotPassword = async (req, res) => {
 
                     if (data && moment().diff(data?.validTill, 'minute') <= 0) {
                         res.status(SC.BAD_REQUEST).json({
-                            message:
-                                'Valid UUID is already available for this user in DB!'
+                            error: 'Token has already been sent. Check your mail'
                         })
                     } else {
                         const result = {
@@ -307,7 +475,7 @@ const forgotPassword = async (req, res) => {
                                 const forgotPassword = new forgotPasswordModel(
                                     result
                                 )
-                                forgotPassword.save((err, data) => {
+                                forgotPassword.save((err) => {
                                     if (err) {
                                         return res.status(SC.BAD_REQUEST).json({
                                             error: 'Failed to update forgot password!'
@@ -315,8 +483,7 @@ const forgotPassword = async (req, res) => {
                                     }
                                     res.status(SC.OK).json({
                                         message:
-                                            'Forgot Password UUID created succeffully and url link has been sent to the user!',
-                                        data
+                                            'Forgot Password UUID created succeffully and url link has been sent to the user!'
                                     })
                                 })
 
@@ -325,7 +492,7 @@ const forgotPassword = async (req, res) => {
                             .catch((error) => {
                                 logger(error, 'ERROR')
                                 res.status(SC.BAD_REQUEST).json({
-                                    message: 'Forgot Password failed!'
+                                    error: 'Forgot Password failed!'
                                 })
                             })
                     }
@@ -395,7 +562,7 @@ const forgotPasswordChange = async (req, res) => {
                     })
                 } else {
                     res.status(SC.NOT_FOUND).json({
-                        error: 'No forgot password document found!'
+                        error: 'Invalid token'
                     })
                 }
             })
@@ -455,46 +622,65 @@ const googleLogin = (req, res) => {
                                 user
                             })
                         } else {
-                            const encrypted_password = idToken + email
-                            const userNew = new userModel({
-                                email,
-                                name: given_name,
-                                lastname: family_name,
-                                encrypted_password
-                            })
-                            userNew.save((err, data) => {
-                                if (err) {
-                                    return res.status(SC.BAD_REQUEST).json({
-                                        error: 'Failed to add user in DB!'
+                            const prefix = 'USR'
+                            let suffix = 0
+                            userModel
+                                .findOne({})
+                                .sort({ createdAt: -1 })
+                                .then((data) => {
+                                    if (data?.docId) {
+                                        suffix =
+                                            parseInt(data.docId?.substr(3)) + 1
+                                    } else {
+                                        suffix = '000000'
+                                    }
+                                    const encrypted_password = idToken + email
+                                    const userNew = new userModel({
+                                        docId: `${prefix}${generateDocumentId(
+                                            suffix,
+                                            6
+                                        )}`,
+                                        email,
+                                        name: given_name,
+                                        lastname: family_name,
+                                        encrypted_password
                                     })
-                                } else {
-                                    const expiryTime = new Date()
-                                    expiryTime.setMonth(
-                                        expiryTime.getMonth() + 6
-                                    )
-                                    const exp = parseInt(
-                                        expiryTime.getTime() / 1000
-                                    )
+                                    userNew.save((err, data) => {
+                                        if (err) {
+                                            return res
+                                                .status(SC.BAD_REQUEST)
+                                                .json({
+                                                    error: 'Failed to add user in DB!'
+                                                })
+                                        } else {
+                                            const expiryTime = new Date()
+                                            expiryTime.setMonth(
+                                                expiryTime.getMonth() + 6
+                                            )
+                                            const exp = parseInt(
+                                                expiryTime.getTime() / 1000
+                                            )
 
-                                    const token = jwt.sign(
-                                        { _id: data._id, exp },
-                                        process.env.SECRET
-                                    )
+                                            const token = jwt.sign(
+                                                { _id: data._id, exp },
+                                                process.env.SECRET
+                                            )
 
-                                    res.cookie('Token', token, {
-                                        expire: new Date() + 9999
+                                            res.cookie('Token', token, {
+                                                expire: new Date() + 9999
+                                            })
+
+                                            data.salt = undefined
+                                            data.__v = undefined
+                                            return res.status(SC.OK).json({
+                                                message:
+                                                    'User Logged in Successfully from Google!',
+                                                token,
+                                                user: data
+                                            })
+                                        }
                                     })
-
-                                    data.salt = undefined
-                                    data.__v = undefined
-                                    return res.status(SC.OK).json({
-                                        message:
-                                            'User Logged in Successfully from Google!',
-                                        token,
-                                        user
-                                    })
-                                }
-                            })
+                                })
                         }
                     })
                 }
@@ -582,6 +768,28 @@ const facebookLogin = async (req, res) => {
     }
 }
 
+const lastLoggedIn = async (req, res) => {
+    try {
+        const _id = req.auth._id
+        userModel
+            .updateOne({ _id }, { lastLoggedIn: new Date() })
+            .then(() => {
+                res.status(SC.OK).json({
+                    message: 'Last logged in updated'
+                })
+            })
+            .catch(() => {
+                res.status(SC.BAD_REQUEST).json({
+                    error: 'Error updating last logged in'
+                })
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Last Logged In function executed')
+    }
+}
+
 module.exports = {
     signup,
     signin,
@@ -589,8 +797,14 @@ module.exports = {
     forgotPassword,
     forgotPasswordChange,
     update,
+    updateAdmin,
+    addEmploymentRecord,
+    deleteEmploymentRecord,
+    addEmploymentRecordAdmin,
+    deleteEmploymentRecordAdmin,
     updateRole,
     signout,
     googleLogin,
-    facebookLogin
+    facebookLogin,
+    lastLoggedIn
 }

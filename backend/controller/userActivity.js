@@ -16,7 +16,7 @@ const createActivity = async (req, res) => {
         createdBy: ''
     }
     let userId = req.params.userId
-    const { activityDetails, admin } = req.body
+    const { activityDetails, createdBy } = req.body
     try {
         await userModel.findOne({ _id: userId }).exec((err, data) => {
             if (err) {
@@ -26,9 +26,7 @@ const createActivity = async (req, res) => {
                 result.userId = userId
                 result.userName = data.name
                 result.activityDetails = activityDetails
-                admin !== undefined && admin
-                    ? (result.createdBy = admin)
-                    : (result.createdBy = 'self')
+                result.createdBy = createdBy
 
                 const activityModel = new userActivityModel(result)
                 activityModel.save((err, data) => {
@@ -137,39 +135,17 @@ const getOtherUserActivity = async (req, res) => {
 
 const getAllUserActivities = async (req, res) => {
     let result
+    let options = {
+        page: 2,
+        limit: 10,
+        customLabels: label
+    }
+    req.query.page !== undefined ? (options.page = req.query.page) : null
+    req.query.limit !== undefined ? (options.limit = req.query.limit) : null
+
     try {
         if (req.query.userId === undefined) {
-            result = await userActivityModel
-                .aggregate([
-                    {
-                        $group: {
-                            _id: {
-                                userId: '$userId',
-                                userName: '$userName'
-                            },
-                            activities: {
-                                $push: {
-                                    activityId: '$_id',
-                                    activityDetails: '$activityDetails',
-                                    createdBy: '$createdBy',
-                                    createdAt: {
-                                        $dateToString: {
-                                            date: '$createdAt',
-                                            timezone: 'Asia/Kolkata'
-                                        }
-                                    },
-                                    updatedAt: {
-                                        $dateToString: {
-                                            date: '$updatedAt',
-                                            timezone: 'Asia/Kolkata'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                ])
-                .sort({ _id: -1 })
+            result = await userActivityModel.find({}).sort({ createdAt: -1 })
         } else {
             const userId = mongoose.Types.ObjectId(req.query.userId)
             result = await userActivityModel

@@ -126,6 +126,73 @@ const updateBucket = async (req, res) => {
     }
 }
 
+const enrollStudents = async (req, res) => {
+    const { students } = req.body
+    try {
+        students === undefined
+            ? res.status(SC.BAD_REQUEST).json({
+                  error: 'Students is undefined'
+              })
+            : await bucketModel
+                  .updateOne(
+                      { _id: req.params.bucketId },
+                      {
+                          $addToSet: {
+                              students
+                          }
+                      }
+                  )
+                  .then(() => {
+                      res.status(SC.OK).json({
+                          message: 'Students enrolled successfully!'
+                      })
+                  })
+                  .catch(() => {
+                      res.status(SC.BAD_REQUEST).json({
+                          error: 'Students enrollment Failed!'
+                      })
+                  })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Enroll Students in Bucket Function is Executed!')
+    }
+}
+
+const removeStudents = async (req, res) => {
+    const students = req.body.students
+    try {
+        await bucketModel
+            .updateOne(
+                { _id: req.params.bucketId },
+                {
+                    $pull: {
+                        students: {
+                            studentId: {
+                                $in: students
+                            }
+                        }
+                    }
+                }
+            )
+            .then(() => {
+                res.status(SC.OK).json({
+                    message: 'Student removed successfully from this basket!'
+                })
+            })
+            .catch((err) => {
+                res.status(SC.BAD_REQUEST).json({
+                    error: 'Removing student basket is failed!'
+                })
+                logger(err, 'ERROR')
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Remove Students from Basket Function is Executed!')
+    }
+}
+
 const updateBucketStatus = async (req, res) => {
     const { status } = req.body
     try {
@@ -197,22 +264,24 @@ const getBucketById = async (req, res) => {
 
 const getAllBuckets = async (req, res) => {
     try {
-        await bucketModel.find({}).exec((err, data) => {
-            if (err) {
-                logger(err, 'ERROR')
-            }
-            if (data) {
-                data.forEach((val) => (val.students = undefined))
-                res.status(SC.OK).json({
-                    message: 'Buckets fetched successfully!',
-                    data: data
-                })
-            } else {
-                res.status(SC.NOT_FOUND).json({
-                    error: 'No Buckets found!'
-                })
-            }
-        })
+        await bucketModel
+            .find({})
+            .sort({ createdAt: -1 })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.OK).json({
+                        message: 'Buckets fetched successfully!',
+                        data: data
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No Buckets found!'
+                    })
+                }
+            })
     } catch (err) {
         logger(err, 'ERROR')
     } finally {
@@ -254,5 +323,7 @@ module.exports = {
     updateBucketStatus,
     getBucketById,
     getAllBuckets,
-    deleteBucketById
+    deleteBucketById,
+    enrollStudents,
+    removeStudents
 }

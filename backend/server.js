@@ -35,9 +35,12 @@ const message = require('./route/message')
 const classes = require('./route/class')
 const bucket = require('./route/bucket')
 const courseMaterial = require('./route/courseMaterial')
+const constant = require('./route/constants')
+const progress = require('./route/progress')
 const coupon = require('./route/coupon')
 const application = require('./route/application')
 const requirements = require('./route/requirements')
+const myPurchases = require('./route/myPurchases')
 
 //built-in middlewares
 app.use(express.static('public'))
@@ -63,9 +66,12 @@ app.use('/api', message)
 app.use('/api', classes)
 app.use('/api', bucket)
 app.use('/api', courseMaterial)
+app.use('/api', constant)
+app.use('/api', progress)
 app.use('/api', coupon)
 app.use('/api', application)
 app.use('/api', requirements)
+app.use('/api', myPurchases)
 
 const PORT = process.env.PORT || 8000
 

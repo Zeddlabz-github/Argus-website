@@ -1,12 +1,14 @@
 const express = require('express')
 const {
     buyCourse,
+    buyCourseAdmin,
     createCourse,
     createModule,
     createChapter,
     addSlide,
     addQuestion,
     getAllCourse,
+    getUsersCourses,
     getCourse,
     getModule,
     getChapter,
@@ -17,7 +19,9 @@ const {
     deleteSlide,
     editChapter,
     editModule,
-    editCourse
+    editCourse,
+    getDuration,
+    getCourseDetails
 } = require('../controller/courseMaterial')
 const {
     isValidToken,
@@ -28,6 +32,13 @@ const {
 const router = express.Router()
 
 router.post('/material/buyCourse', isSignedIn, isValidToken, buyCourse)
+router.post(
+    '/material/buyCourseAdmin',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    buyCourseAdmin
+)
 
 router.post(
     '/material/addCourse',
@@ -59,13 +70,15 @@ router.put(
     addQuestion
 )
 
+router.get('/material/getAllCourses', getAllCourse)
+
 router.get(
-    '/material/getAllCourses',
+    '/material/getUsersCourses',
     isSignedIn,
     isValidToken,
-    isAdmin,
-    getAllCourse
+    getUsersCourses
 )
+
 router.get(
     '/material/getCourse/:courseId',
     isSignedIn,
@@ -73,6 +86,13 @@ router.get(
     hasCourseorAdmin,
     getCourse
 )
+router.get(
+    '/material/getCourseDetails/:courseId',
+    isSignedIn,
+    isValidToken,
+    getCourseDetails
+)
+
 router.get(
     '/material/getModule/:courseId/:id',
     isSignedIn,
@@ -138,5 +158,7 @@ router.put(
     isAdmin,
     editChapter
 )
+
+router.post('/material/getDuration', isSignedIn, isValidToken, getDuration)
 
 module.exports = router

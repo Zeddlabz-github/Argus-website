@@ -1,6 +1,13 @@
+/**
+ * @author utkarsh
+ */
+
+const progressModel = require('../model/progress')
 const courseModel = require('../model/courseMaterial/course')
 const moduleModel = require('../model/courseMaterial/modules')
 const chapterModel = require('../model/courseMaterial/chapters')
+const purchaseModel = require('../model/myPurchases')
+
 const userModel = require('../model/user.js')
 const formidable = require('formidable')
 const { statusCode: SC } = require('../utils/statusCode')
@@ -8,15 +15,158 @@ const { loggerUtil: logger } = require('../utils/logger')
 const fs = require('fs')
 
 const buyCourse = async (req, res) => {
-    const { courseId } = req.body
-    const authId = req.auth._id
+    const { courseId, desc, name, order, originalPrice, coupon } = req.body
+    const userId = req.auth._id
     try {
         await userModel
-            .updateOne({ _id: authId }, { $addToSet: { courses: courseId } })
-            .then(() => {
-                return res.status(SC.OK).json({
-                    message: `Course added successfully!`
+            .findOne({ _id: userId })
+            .then((data) => {
+                if (data.courses.length === 0) {
+                    userModel
+                        .updateOne(
+                            { _id: userId },
+                            { $addToSet: { courses: courseId } }
+                        )
+                        .then(async () => {
+                            const progress = new progressModel({
+                                userId,
+                                courses: [{ courseId }]
+                            })
+                            const purchase = new purchaseModel({
+                                userId,
+                                itemId: courseId,
+                                itemType: 'Course',
+                                itemDesc: desc,
+                                itemName: name,
+                                paymentObj: order,
+                                itemOriginalPrice: originalPrice,
+                                coupon
+                            })
+                            await progress.save().then(() => {
+                                res.status(SC.OK).json({
+                                    message: `Course added successfully!`
+                                })
+                            })
+                            await purchase.save().then(() => {
+                                res.status(SC.OK).json({
+                                    message: `Purchase added successfully!`
+                                })
+                            })
+                        })
+                        .catch((err) => {
+                            logger(err, 'ERROR')
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'Error adding course'
+                            })
+                        })
+                } else {
+                    userModel
+                        .updateOne(
+                            { _id: userId },
+                            { $addToSet: { courses: courseId } }
+                        )
+                        .then(async () => {
+                            await progressModel
+                                .updateOne(
+                                    { userId },
+                                    { $push: { courses: { courseId } } }
+                                )
+                                .then(() => {
+                                    res.status(SC.OK).json({
+                                        message: `Course added successfully!`
+                                    })
+                                })
+                            const purchase = new purchaseModel({
+                                userId,
+                                itemId: courseId,
+                                itemType: 'Course',
+                                itemDesc: desc,
+                                itemName: name,
+                                paymentObj: order,
+                                itemOriginalPrice: originalPrice,
+                                coupon
+                            })
+                            await purchase.save().then(() => {
+                                res.status(SC.OK).json({
+                                    message: `Purchase added successfully!`
+                                })
+                            })
+                        })
+                        .catch((err) => {
+                            logger(err, 'ERROR')
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'Error adding course'
+                            })
+                        })
+                }
+            })
+            .catch((err) => {
+                logger(err, 'ERROR')
+                return res.status(SC.BAD_REQUEST).json({
+                    error: 'Error adding course'
                 })
+            })
+    } catch (error) {
+        logger(error, 'ERROR')
+    } finally {
+        logger('Buy Course Function is Executed')
+    }
+}
+
+const buyCourseAdmin = async (req, res) => {
+    const { courseId, userId } = req.body
+    try {
+        await userModel
+            .findOne({ _id: userId })
+            .then((data) => {
+                if (data.courses.length === 0) {
+                    userModel
+                        .updateOne(
+                            { _id: userId },
+                            { $addToSet: { courses: courseId } }
+                        )
+                        .then(() => {
+                            const progress = new progressModel({
+                                userId,
+                                courses: [{ courseId }]
+                            })
+                            progress.save().then(() => {
+                                res.status(SC.OK).json({
+                                    message: `Course added successfully!`
+                                })
+                            })
+                        })
+                        .catch((err) => {
+                            logger(err, 'ERROR')
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'Error adding course'
+                            })
+                        })
+                } else {
+                    userModel
+                        .updateOne(
+                            { _id: userId },
+                            { $addToSet: { courses: courseId } }
+                        )
+                        .then(() => {
+                            progressModel
+                                .updateOne(
+                                    { userId },
+                                    { $push: { courses: { courseId } } }
+                                )
+                                .then(() => {
+                                    res.status(SC.OK).json({
+                                        message: `Course added successfully!`
+                                    })
+                                })
+                        })
+                        .catch((err) => {
+                            logger(err, 'ERROR')
+                            return res.status(SC.BAD_REQUEST).json({
+                                error: 'Error adding course'
+                            })
+                        })
+                }
             })
             .catch((err) => {
                 logger(err, 'ERROR')
@@ -78,6 +228,40 @@ const getAllCourse = async (req, res) => {
     }
 }
 
+const getUsersCourses = async (req, res) => {
+    const _id = req.auth._id
+    try {
+        userModel
+            .findOne({ _id })
+            .then((data) => {
+                courseModel
+                    .find({ _id: { $in: data.courses } })
+                    .then((courseData) => {
+                        res.status(SC.OK).json({
+                            message: `Course fetched successfully!`,
+                            data: courseData
+                        })
+                    })
+                    .catch((err) => {
+                        logger(err, 'ERROR')
+                        return res.status(SC.BAD_REQUEST).json({
+                            error: 'Error fetching course'
+                        })
+                    })
+            })
+            .catch((err) => {
+                logger(err, 'ERROR')
+                return res.status(SC.BAD_REQUEST).json({
+                    error: 'User does not exists'
+                })
+            })
+    } catch (error) {
+        logger(error, 'ERROR')
+    } finally {
+        logger('Fetch Users Course Function is Executed')
+    }
+}
+
 const getCourse = async (req, res) => {
     const courseId = req.params.courseId
     try {
@@ -90,6 +274,34 @@ const getCourse = async (req, res) => {
                         data: { Course: data, Module: moduleData }
                     })
                 })
+            })
+            .catch((err) => {
+                logger(err, 'ERROR')
+                return res.status(SC.BAD_REQUEST).json({
+                    error: 'Error fetching course'
+                })
+            })
+    } catch (error) {
+        logger(error, 'ERROR')
+    } finally {
+        logger('Fetch Course Function is Executed')
+    }
+}
+
+const getCourseDetails = async (req, res) => {
+    const courseId = req.params.courseId
+    try {
+        await courseModel
+            .findOne({ _id: courseId })
+            .then((data) => {
+                moduleModel
+                    .find({ courseId }, { description: 0, duration: 0 })
+                    .then((moduleData) => {
+                        res.status(SC.OK).json({
+                            message: `Course fetched successfully!`,
+                            data: { Course: data, Module: moduleData }
+                        })
+                    })
             })
             .catch((err) => {
                 logger(err, 'ERROR')
@@ -567,8 +779,14 @@ const getSlideImage = async (req, res) => {
                     logger(err, 'ERROR')
                 }
                 if (data) {
-                    res.set('Content-Type', data?.slides[0]?.contentType)
-                    return res.status(SC.OK).send(data?.slides[0]?.data)
+                    if (data.slides[0].data !== null) {
+                        res.set('Content-Type', data?.slides[0]?.contentType)
+                        return res.status(SC.OK).send(data?.slides[0]?.data)
+                    } else {
+                        res.status(SC.NOT_FOUND).json({
+                            error: 'No Slide photo found!'
+                        })
+                    }
                 } else {
                     res.status(SC.NOT_FOUND).json({
                         error: 'No Slide photo found!'
@@ -609,14 +827,60 @@ const deleteSlide = async (req, res) => {
     }
 }
 
+const getDuration = async (req, res) => {
+    const { chapters } = req.body
+    console.log(chapters)
+    try {
+        await chapterModel
+            .find(
+                { _id: { $in: chapters } },
+                {
+                    slides: 0,
+                    _id: 0,
+                    __v: 0,
+                    name: 0,
+                    description: 0,
+                    moduleId: 0,
+                    courseId: 0,
+                    createdAt: 0,
+                    updatedAt: 0
+                }
+            )
+            .then((data) => {
+                let min = 0
+                data.forEach((element) => {
+                    min = min + element.duration
+                })
+                if (data) {
+                    res.status(SC.OK).json({
+                        message: `Duration fetched successfully`,
+                        data: min
+                    })
+                }
+            })
+            .catch((err) => {
+                logger(err, 'ERROR')
+                return res.status(SC.BAD_REQUEST).json({
+                    error: 'Error fetching duration'
+                })
+            })
+    } catch (error) {
+        logger(error, 'ERROR')
+    } finally {
+        logger('Fetch Duration Function is Executed')
+    }
+}
+
 module.exports = {
     buyCourse,
+    buyCourseAdmin,
     createCourse,
     createModule,
     createChapter,
     addSlide,
     addQuestion,
     getAllCourse,
+    getUsersCourses,
     getCourse,
     getModule,
     getChapter,
@@ -627,5 +891,7 @@ module.exports = {
     deleteSlide,
     editChapter,
     editModule,
-    editCourse
+    editCourse,
+    getDuration,
+    getCourseDetails
 }

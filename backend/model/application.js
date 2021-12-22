@@ -7,7 +7,32 @@ const paginate = require('mongoose-paginate-v2')
 
 const appilcationSchema = new mongoose.Schema(
     {
-        name: {
+        firstname: {
+            type: String,
+            trim: true,
+            required: true
+        },
+        lastname: {
+            type: String,
+            trim: true,
+            required: true
+        },
+        phone: {
+            type: Number,
+            trim: true,
+            required: true
+        },
+        country: {
+            type: String,
+            trim: true,
+            required: true
+        },
+        state: {
+            type: String,
+            trim: true,
+            required: true
+        },
+        address: {
             type: String,
             trim: true,
             required: true
@@ -19,15 +44,18 @@ const appilcationSchema = new mongoose.Schema(
         },
         elegibleToWorkInCanada: {
             type: Boolean,
-            default: false
+            default: false,
+            required: true
         },
         eligibilityType: {
             type: String,
-            trim: true
+            trim: true,
+            required: true
         },
         validSecurityGuardLicence: {
             type: Boolean,
-            default: false
+            default: false,
+            required: true
         },
         licenceNo: {
             type: String,
@@ -35,23 +63,28 @@ const appilcationSchema = new mongoose.Schema(
         },
         canDrive: {
             type: Boolean,
-            default: false
+            default: false,
+            required: true
         },
         highestLevelOfEducation: {
             type: String,
-            trim: true
+            trim: true,
+            required: true
         },
         educationInCanada: {
             type: Boolean,
-            default: false
+            default: false,
+            required: true
         },
         priorExperience: {
             type: Boolean,
-            default: false
+            default: false,
+            required: true
         },
         yearsOfExp: {
             type: String,
-            trim: true
+            trim: true,
+            required: true
         }
     },
     { timestamps: true }

@@ -77,7 +77,7 @@ const createClass = async (req, res) => {
 }
 
 const enrollStudents = async (req, res) => {
-    const students = req.body.students
+    const { students, classname } = req.body
     try {
         students === undefined
             ? res.status(SC.BAD_REQUEST).json({
@@ -87,15 +87,23 @@ const enrollStudents = async (req, res) => {
                   .updateOne(
                       { _id: req.params.classId },
                       {
-                          $set: {
+                          $push: {
                               students
                           }
                       }
                   )
                   .then(() => {
-                      res.status(SC.OK).json({
-                          message: 'Students enrolled successfully!'
-                      })
+                      let ids = students.map((x) => x.studentId)
+                      userModel
+                          .updateMany(
+                              { _id: { $in: ids } },
+                              { $addToSet: { classAttended: classname } }
+                          )
+                          .then(() => {
+                              res.status(SC.OK).json({
+                                  message: 'Students enrolled successfully!'
+                              })
+                          })
                   })
                   .catch(() => {
                       res.status(SC.BAD_REQUEST).json({
@@ -110,7 +118,7 @@ const enrollStudents = async (req, res) => {
 }
 
 const removeStudents = async (req, res) => {
-    const students = req.body.students
+    const { students, classname } = req.body
     try {
         await classModel
             .updateOne(
@@ -126,9 +134,17 @@ const removeStudents = async (req, res) => {
                 }
             )
             .then(() => {
-                res.status(SC.OK).json({
-                    message: 'Student removed successfully from this class!'
-                })
+                userModel
+                    .updateMany(
+                        { _id: { $in: students } },
+                        { $pull: { classAttended: classname } }
+                    )
+                    .then(() => {
+                        res.status(SC.OK).json({
+                            message:
+                                'Student removed successfully from this class!'
+                        })
+                    })
             })
             .catch((err) => {
                 res.status(SC.BAD_REQUEST).json({
@@ -217,21 +233,24 @@ const getClassById = async (req, res) => {
 
 const getAllClasses = async (req, res) => {
     try {
-        await classModel.find({}).exec((err, data) => {
-            if (err) {
-                logger(err, 'ERROR')
-            }
-            if (data) {
-                res.status(SC.OK).json({
-                    message: 'Classes fetched successfully!',
-                    data: data
-                })
-            } else {
-                res.status(SC.NOT_FOUND).json({
-                    error: 'No Classes found!'
-                })
-            }
-        })
+        await classModel
+            .find({})
+            .sort({ createdAt: -1 })
+            .exec((err, data) => {
+                if (err) {
+                    logger(err, 'ERROR')
+                }
+                if (data) {
+                    res.status(SC.OK).json({
+                        message: 'Classes fetched successfully!',
+                        data: data
+                    })
+                } else {
+                    res.status(SC.NOT_FOUND).json({
+                        error: 'No Classes found!'
+                    })
+                }
+            })
     } catch (err) {
         logger(err, 'ERROR')
     } finally {
@@ -240,16 +259,19 @@ const getAllClasses = async (req, res) => {
 }
 
 const getStudentClasses = async (req, res) => {
-    const studentId = req.params.studentId
+    const studentId = req.auth._id
     try {
         await classModel
-            .find({
-                students: {
-                    $elemMatch: {
-                        studentId: studentId
+            .find(
+                {
+                    students: {
+                        $elemMatch: {
+                            studentId: studentId
+                        }
                     }
-                }
-            })
+                },
+                { students: 0, noOfSpots: 0 }
+            )
             .exec((err, data) => {
                 if (err) {
                     logger(err, 'ERROR')
@@ -300,6 +322,56 @@ const deleteClassById = async (req, res) => {
     }
 }
 
+const markAttendance = async (req, res) => {
+    try {
+        await classModel
+            .updateOne(
+                { 'students._id': req.params.id },
+                {
+                    $set: {
+                        'students.$.attendence': req.body.attendence,
+                        'students.$.note': req.body.note
+                    }
+                }
+            )
+            .then(() => {
+                if (req.body.attendence) {
+                    userModel
+                        .updateOne(
+                            { _id: req.params.studentId },
+                            { $addToSet: { classAttended: req.body.className } }
+                        )
+                        .then(() => {
+                            res.status(SC.OK).json({
+                                message: 'Attendance marked successfully!'
+                            })
+                        })
+                } else {
+                    userModel
+                        .updateOne(
+                            { _id: req.params.studentId },
+                            { $pull: { classAttended: req.body.className } }
+                        )
+                        .then(() => {
+                            res.status(SC.OK).json({
+                                message: 'Attendance marked successfully!'
+                            })
+                        })
+                }
+            })
+            .catch((err) => {
+                res.status(SC.BAD_REQUEST).json({
+                    error: 'Marking attendance from DB is failed!'
+                })
+                logger(err, 'ERROR')
+            })
+    } catch (err) {
+        logger(err, 'ERROR')
+    } finally {
+        logger('Mark Attendance Function is Executed!')
+    }
+}
+
 module.exports = {
     createClass,
     enrollStudents,
@@ -308,5 +380,6 @@ module.exports = {
     getClassById,
     getAllClasses,
     getStudentClasses,
-    deleteClassById
+    deleteClassById,
+    markAttendance
 }

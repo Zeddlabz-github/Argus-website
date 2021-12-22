@@ -8,7 +8,9 @@ const {
     getUserByQuery,
     getAllStudents,
     getAllEmployees,
-    getAllInsturctors
+    getAllInsturctors,
+    blockunblock,
+    getUserPhoto
 } = require('../controller/user')
 const {
     isSignedIn,
@@ -19,6 +21,13 @@ const {
 
 router.param('userId', getUserById)
 router.get('/user/get/:userId', isSignedIn, isAuthenticated, getUser)
+router.get(
+    '/user/getUserAdmin/:userId',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    getUser
+)
 router.post('/user/get-user', getUserByQuery)
 router.get('/user/get-all', isSignedIn, isValidToken, isAdmin, getAllUsers)
 router.get(
@@ -42,5 +51,7 @@ router.get(
     isAdmin,
     getAllInsturctors
 )
+router.put('/user/block', isSignedIn, isValidToken, isAdmin, blockunblock)
+router.get('/user/profilePhoto/:id', getUserPhoto)
 
 module.exports = router

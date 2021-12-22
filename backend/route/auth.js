@@ -9,13 +9,19 @@ const {
     signup,
     signin,
     update,
+    updateAdmin,
+    addEmploymentRecord,
+    deleteEmploymentRecord,
+    addEmploymentRecordAdmin,
+    deleteEmploymentRecordAdmin,
     updateRole,
     signout,
     googleLogin,
     facebookLogin,
     changePassword,
     forgotPassword,
-    forgotPasswordChange
+    forgotPasswordChange,
+    lastLoggedIn
 } = require('../controller/auth')
 
 const {
@@ -48,12 +54,14 @@ router.post(
 )
 
 router.post(
-    '/change-password/:userId',
+    '/change-password',
     [
         check('newPassword')
             .isLength({ min: 6 })
             .withMessage('New Password should be minimum of 6 characters')
     ],
+    isSignedIn,
+    isValidToken,
     changePassword
 )
 
@@ -82,6 +90,44 @@ router.put(
     update
 )
 router.put(
+    '/user/updateAdmin/:id',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    updateAdmin
+)
+
+router.put(
+    '/user/addJobHistory',
+    [check('id').isUUID().withMessage('Please Provide id')],
+    isSignedIn,
+    isValidToken,
+    addEmploymentRecord
+)
+router.delete(
+    '/user/deleteJobHistory/:id',
+    [check('id').isUUID().withMessage('Please Provide id')],
+    isSignedIn,
+    isValidToken,
+    deleteEmploymentRecord
+)
+
+router.put(
+    '/user/addJobHistoryAdmin/:id',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    addEmploymentRecordAdmin
+)
+router.delete(
+    '/user/deleteJobHistoryAdmin/:userId/:id',
+    isSignedIn,
+    isValidToken,
+    isAdmin,
+    deleteEmploymentRecordAdmin
+)
+
+router.put(
     '/user/updateRole/:userId',
     isSignedIn,
     isValidToken,
@@ -90,5 +136,7 @@ router.put(
 )
 
 router.get('/signout', signout)
+
+router.put('/user/lastLoggedIn', isSignedIn, isValidToken, lastLoggedIn)
 
 module.exports = router
