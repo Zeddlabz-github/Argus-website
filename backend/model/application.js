@@ -85,6 +85,11 @@ const appilcationSchema = new mongoose.Schema(
             type: String,
             trim: true,
             required: true
+        },
+        applyingFor: {
+            type: String,
+            trim: true,
+            required: true
         }
     },
     { timestamps: true }
